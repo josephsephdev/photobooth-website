@@ -55,6 +55,7 @@ jobs:
 
       - name: Build
         env:
+          VITE_BASE_PATH: /photobooth-website/
           VITE_APPWRITE_ENDPOINT: ${{ secrets.VITE_APPWRITE_ENDPOINT }}
           VITE_APPWRITE_PROJECT_ID: ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
           VITE_APPWRITE_DATABASE_ID: ${{ secrets.VITE_APPWRITE_DATABASE_ID || 'photobooth_db' }}

@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, Eye, EyeOff, Mail, Lock, UserCircle, LogOut } from 'lucide-react';
+import { Camera, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { createDesktopAuthCode } from '../lib/desktop-auth.service';
-import { getCurrentUser, signOut as authSignOut } from '../lib/auth.service';
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,60 +28,11 @@ export default function SignIn() {
     ? `?source=desktop&redirect=${encodeURIComponent(redirect!)}`
     : '';
 
-  // ── Desktop: detect existing session ────────────────────────────
-  const [existingUser, setExistingUser] = useState<{ name: string; email: string } | null>(null);
-  const [checkingSession, setCheckingSession] = useState(isDesktop);
-  const [continuingAs, setContinuingAs] = useState(false);
-
-  useEffect(() => {
-    if (!isDesktop) return;
-    getCurrentUser()
-      .then((u) => {
-        if (u) setExistingUser({ name: u.name, email: u.email });
-      })
-      .catch(() => { /* no session */ })
-      .finally(() => setCheckingSession(false));
-  }, [isDesktop]);
-
-  /** Desktop: continue with the already-logged-in account */
-  const handleContinueAsExisting = async () => {
-    setContinuingAs(true);
-    setError('');
-    try {
-      const code = await createDesktopAuthCode();
-      if (code) {
-        window.location.href = `${redirect}?code=${encodeURIComponent(code)}`;
-        return;
-      }
-      setError('Failed to generate desktop auth code. Please try again.');
-    } catch (err: any) {
-      console.error('Desktop auth code generation failed:', err);
-      setError(err.message || 'Failed to generate desktop auth code');
-    } finally {
-      setContinuingAs(false);
-    }
-  };
-
-  /** Desktop: sign out the current website session so user can login with a different account */
-  const handleUseAnotherAccount = async () => {
-    setError('');
-    try {
-      await authSignOut();
-      setExistingUser(null);
-    } catch {
-      // Session may already be gone — that's fine
-      setExistingUser(null);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
-    try {      // Desktop flow: ensure no stale session blocks the new login
-      if (isDesktop) {
-        try { await authSignOut(); } catch { /* no session to clear — fine */ }
-      }
+    try {
       await signIn(email, password);
 
       // ── Desktop app callback ──────────────────────────────────
@@ -90,11 +40,13 @@ export default function SignIn() {
         try {
           const code = await createDesktopAuthCode();
           if (code) {
+            // Redirect back to the desktop app with the one-time code
             window.location.href = `${redirect}?code=${encodeURIComponent(code)}`;
             return;
           }
         } catch (exchangeErr) {
           console.error('Desktop auth code generation failed:', exchangeErr);
+          // Fall through to normal navigation
         }
       }
 
@@ -139,58 +91,7 @@ export default function SignIn() {
               <p className="text-ev-text-secondary text-sm">Sign in to your PhotoBooth Pro account</p>
             </div>
 
-            {/* Desktop: existing session detected — show continue / switch options */}
-            {isDesktop && checkingSession && (
-              <div className="text-center py-8">
-                <div className="w-8 h-8 border-2 border-ev-accent/30 border-t-ev-accent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-ev-text-muted">Checking session…</p>
-              </div>
-            )}
-
-            {isDesktop && !checkingSession && existingUser && (
-              <div className="space-y-4 mb-6">
-                <div className="bg-[#0a0e14]/60 border border-ev-border/60 rounded-xl p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <UserCircle className="w-10 h-10 text-ev-accent shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-ev-text-primary truncate">{existingUser.name || existingUser.email}</p>
-                      <p className="text-xs text-ev-text-muted truncate">{existingUser.email}</p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-ev-text-secondary mb-3">
-                    You're already signed in on this browser. Continue with this account to sign in to your desktop app.
-                  </p>
-                  {error && <p className="text-xs text-ev-danger mb-2">{error}</p>}
-                  <Button
-                    onClick={handleContinueAsExisting}
-                    disabled={continuingAs}
-                    className="w-full h-10 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] hover:shadow-[rgba(0,212,170,0.4)] transition-all duration-300 disabled:opacity-60"
-                  >
-                    {continuingAs ? 'Connecting to desktop app…' : `Continue as ${existingUser.name || existingUser.email}`}
-                  </Button>
-                </div>
-
-                <button
-                  onClick={handleUseAnotherAccount}
-                  className="w-full flex items-center justify-center gap-2 text-sm text-ev-text-muted hover:text-ev-accent transition-colors py-2"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  Use a different account
-                </button>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-ev-border/80" />
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-ev-surface/70 px-3 text-ev-text-muted">or sign in below</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Form — hidden during desktop session check */}
-            {(!isDesktop || !checkingSession) && (<>
+            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div className="space-y-2">
@@ -277,7 +178,6 @@ export default function SignIn() {
                 </Link>
               </p>
             </div>
-            </>)}
           </div>
         </motion.div>
       </div>

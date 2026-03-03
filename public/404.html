@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirecting…</title>
+  <script>
+    // GitHub Pages SPA redirect for HashRouter
+    // Converts path-based URLs to hash-based URLs so the React app can handle them.
+    // e.g. /photobooth-website/signin?source=desktop&redirect=...
+    //   → /photobooth-website/#/signin?source=desktop&redirect=...
+    (function () {
+      var basePath = '/photobooth-website';
+      var fullPath = window.location.pathname;
+
+      // Strip the base path prefix to get the SPA route
+      var route = fullPath;
+      if (route.indexOf(basePath) === 0) {
+        route = fullPath.slice(basePath.length);
+      }
+
+      // Only redirect if there's an actual route to preserve
+      if (route && route !== '/') {
+        var search = window.location.search || '';
+        var newUrl = basePath + '/#' + route + search;
+        window.location.replace(newUrl);
+      } else {
+        // No route — just go to the base
+        window.location.replace(basePath + '/');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting…</p>
+</body>
+</html>

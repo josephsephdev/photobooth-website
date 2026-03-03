@@ -55,8 +55,8 @@ router.post('/create-checkout', requireAuth, async (req, res) => {
         given_names: user.name,
         email: user.email,
       },
-      success_redirect_url: `${FRONTEND_URL}/checkout/success?ref=${externalId}`,
-      failure_redirect_url: `${FRONTEND_URL}/checkout/cancel`,
+      success_redirect_url: `${FRONTEND_URL}/#/checkout/success?ref=${externalId}`,
+      failure_redirect_url: `${FRONTEND_URL}/#/checkout/cancel`,
       // Items list (optional but nice for the hosted page)
       items: [
         {

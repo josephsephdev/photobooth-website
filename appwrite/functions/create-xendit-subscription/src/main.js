@@ -94,8 +94,8 @@ export default async function main({ req, res, log, error }) {
         given_names: user.name || user.email.split('@')[0],
         email: user.email,
       },
-      success_redirect_url: `${FRONTEND_URL}/checkout/success?ref=${externalId}`,
-      failure_redirect_url: `${FRONTEND_URL}/checkout/cancel`,
+      success_redirect_url: `${FRONTEND_URL}/#/checkout/success?ref=${externalId}`,
+      failure_redirect_url: `${FRONTEND_URL}/#/checkout/cancel`,
       items: [
         {
           name: plan.name,
