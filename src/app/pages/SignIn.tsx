@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Camera, Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -14,7 +14,7 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signOut, isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -33,6 +33,10 @@ export default function SignIn() {
     setError('');
     setSubmitting(true);
     try {
+      // If there's already an active session, sign out first so we can sign in fresh
+      if (isAuthenticated) {
+        await signOut();
+      }
       await signIn(email, password);
 
       // ── Desktop app callback ──────────────────────────────────
@@ -55,6 +59,41 @@ export default function SignIn() {
       setError(err.message || 'Sign in failed');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  /**
+   * Continue as the currently-signed-in user (desktop flow).
+   * Skips creating a new session — just generates the auth code.
+   */
+  const handleContinueAsUser = async () => {
+    setError('');
+    setSubmitting(true);
+    try {
+      if (isDesktop) {
+        const code = await createDesktopAuthCode();
+        if (code) {
+          window.location.href = `${redirect}?code=${encodeURIComponent(code)}`;
+          return;
+        }
+      }
+      navigate('/account');
+    } catch (err: any) {
+      setError(err.message || 'Failed to continue');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  /**
+   * Sign out the current session so the user can log in with different credentials.
+   */
+  const handleUseDifferentAccount = async () => {
+    setError('');
+    try {
+      await signOut();
+    } catch (err: any) {
+      console.error('Sign out error:', err);
     }
   };
 
@@ -85,6 +124,44 @@ export default function SignIn() {
           className="w-full max-w-md"
         >
           <div className="bg-ev-surface/70 backdrop-blur-xl border border-ev-border/60 rounded-2xl p-8 shadow-[var(--ev-shadow-lg)]">
+
+            {/* ── "Continue as" banner when user already has a session ── */}
+            {!loading && isAuthenticated && user && (
+              <div className="mb-6 p-4 rounded-xl bg-[#0a0e14]/60 border border-ev-border/60">
+                <p className="text-sm text-ev-text-secondary mb-3">
+                  You're already signed in as:
+                </p>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center text-[#0a0e14] font-bold text-lg">
+                    {user.avatarInitial}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-ev-text-primary text-sm">{user.name}</p>
+                    <p className="text-ev-text-muted text-xs">{user.email}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    onClick={handleContinueAsUser}
+                    disabled={submitting}
+                    className="w-full h-10 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] transition-all duration-300 disabled:opacity-60"
+                  >
+                    <LogIn className="w-4 h-4 mr-2" />
+                    {submitting ? 'Connecting…' : `Continue as ${user.name}`}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={handleUseDifferentAccount}
+                    className="text-sm text-ev-text-muted hover:text-ev-accent transition-colors"
+                  >
+                    Use a different account
+                  </button>
+                </div>
+                {error && <p className="text-xs text-ev-danger mt-2">{error}</p>}
+              </div>
+            )}
+
             {/* Title */}
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-ev-text-primary mb-2">Welcome back</h1>
