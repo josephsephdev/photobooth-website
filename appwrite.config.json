@@ -1,0 +1,669 @@
+{
+    "projectId": "69a3ee0a001f86841e7a",
+    "projectName": "PhotoBooth Pro",
+    "endpoint": "https://sgp.cloud.appwrite.io/v1",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "sites": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": true,
+                "phone": true,
+                "invites": true,
+                "anonymous": true,
+                "email-otp": true,
+                "magic-url": true,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "functions": [
+        {
+            "$id": "xendit-webhook-handler",
+            "name": "xendit-webhook-handler",
+            "runtime": "node-22",
+            "path": "functions/xendit-webhook-handler",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "any"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "cancel-xendit-subscription",
+            "name": "cancel-xendit-subscription",
+            "runtime": "node-22",
+            "path": "functions/cancel-xendit-subscription",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "users"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "create-xendit-subscription",
+            "name": "create-xendit-subscription",
+            "runtime": "node-22",
+            "path": "functions/create-xendit-subscription",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "users"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "users.read",
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "renew-xendit-subscription",
+            "name": "renew-xendit-subscription",
+            "runtime": "node-22",
+            "path": "functions/renew-xendit-subscription",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "users"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "users.read",
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "check-user-subscription-access",
+            "name": "check-user-subscription-access",
+            "runtime": "node-22",
+            "path": "functions/check-user-subscription-access",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "any"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "documents.read"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "sync-xendit-payment-history",
+            "name": "sync-xendit-payment-history",
+            "runtime": "node-22",
+            "path": "functions/sync-xendit-payment-history",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "users"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "desktop-auth-handoff",
+            "name": "desktop-auth-handoff",
+            "runtime": "node-22",
+            "path": "functions/desktop-auth-handoff",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "any"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "users.read",
+                "users.write",
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
+        }
+    ],
+    "tablesDB": [
+        {
+            "$id": "photobooth_db",
+            "name": "PhotoBooth DB",
+            "enabled": true
+        }
+    ],
+    "tables": [
+        {
+            "$id": "profiles",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "photobooth_db",
+            "name": "Profiles",
+            "enabled": true,
+            "rowSecurity": false,
+            "columns": [
+                {
+                    "key": "userId",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 36,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "fullName",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 128,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "default": null,
+                    "format": "email"
+                },
+                {
+                    "key": "role",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 20,
+                    "default": "user",
+                    "encrypt": false
+                },
+                {
+                    "key": "createdAt",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "updatedAt",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "idx_userId",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "userId"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_email",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "email"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "subscriptions",
+            "$permissions": [
+                "read(\"users\")"
+            ],
+            "databaseId": "photobooth_db",
+            "name": "Subscriptions",
+            "enabled": true,
+            "rowSecurity": true,
+            "columns": [
+                {
+                    "key": "userId",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 36,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "planId",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "planName",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 100,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "status",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "provider",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 20,
+                    "default": "xendit",
+                    "encrypt": false
+                },
+                {
+                    "key": "providerSubscriptionId",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "startDate",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "nextBillingDate",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "expiresAt",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "canceledAt",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "updatedAt",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "idx_userId",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "userId"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_userId_status",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "userId",
+                        "status"
+                    ],
+                    "orders": [
+                        "asc",
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_expiresAt",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "expiresAt"
+                    ],
+                    "orders": [
+                        "desc"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "payments",
+            "$permissions": [
+                "read(\"users\")"
+            ],
+            "databaseId": "photobooth_db",
+            "name": "Payments",
+            "enabled": true,
+            "rowSecurity": true,
+            "columns": [
+                {
+                    "key": "userId",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 36,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "subscriptionId",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "providerPaymentId",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "amount",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "default": null,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807
+                },
+                {
+                    "key": "currency",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 10,
+                    "default": "PHP",
+                    "encrypt": false
+                },
+                {
+                    "key": "status",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 20,
+                    "default": "pending",
+                    "encrypt": false
+                },
+                {
+                    "key": "method",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 50,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "paidAt",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "createdAt",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "idx_userId",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "userId"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_providerPaymentId",
+                    "type": "unique",
+                    "status": "available",
+                    "columns": [
+                        "providerPaymentId"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_createdAt",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "createdAt"
+                    ],
+                    "orders": [
+                        "desc"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "desktop_auth_codes",
+            "$permissions": [],
+            "databaseId": "photobooth_db",
+            "name": "Desktop Auth Codes",
+            "enabled": true,
+            "rowSecurity": false,
+            "columns": [
+                {
+                    "key": "code",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 64,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "userId",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 36,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "default": null,
+                    "format": "email"
+                },
+                {
+                    "key": "name",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 128,
+                    "default": "",
+                    "encrypt": false
+                },
+                {
+                    "key": "expiresAt",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 30,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "used",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "idx_code",
+                    "type": "unique",
+                    "status": "available",
+                    "columns": [
+                        "code"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_userId",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "userId"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                },
+                {
+                    "key": "idx_expiresAt",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "expiresAt"
+                    ],
+                    "orders": [
+                        "asc"
+                    ]
+                }
+            ]
+        }
+    ],
+    "buckets": [],
+    "teams": [],
+    "topics": []
+}

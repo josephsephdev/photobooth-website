@@ -1,0 +1,16 @@
+{
+  "name": "renew-xendit-subscription",
+  "version": "1.0.0",
+  "description": "Creates a Xendit renewal invoice",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "node-appwrite": "^14.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}

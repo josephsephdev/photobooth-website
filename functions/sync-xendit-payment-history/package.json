@@ -1,0 +1,16 @@
+{
+  "name": "sync-xendit-payment-history",
+  "version": "1.0.0",
+  "description": "Periodic sync of Xendit payments to Appwrite",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "node-appwrite": "^14.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}

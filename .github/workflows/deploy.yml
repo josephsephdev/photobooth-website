@@ -1,0 +1,77 @@
+# Deploy to GitHub Pages using GitHub Actions
+#
+# This workflow builds the Vite React app and deploys it to GitHub Pages.
+# It runs on every push to the `main` branch.
+#
+# Required repository secrets (Settings → Secrets → Actions):
+#   VITE_APPWRITE_ENDPOINT      — e.g. https://sgp.cloud.appwrite.io/v1
+#   VITE_APPWRITE_PROJECT_ID    — your Appwrite project ID
+#   VITE_APP_URL                — your GitHub Pages URL (e.g. https://yourusername.github.io/photobooth-website)
+#
+# Optional (have defaults):
+#   VITE_APPWRITE_DATABASE_ID
+#   VITE_APPWRITE_COLLECTION_PROFILES
+#   VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS
+#   VITE_APPWRITE_COLLECTION_PAYMENTS
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # allow manual trigger
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_APPWRITE_ENDPOINT: ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          VITE_APPWRITE_PROJECT_ID: ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
+          VITE_APPWRITE_DATABASE_ID: ${{ secrets.VITE_APPWRITE_DATABASE_ID || 'photobooth_db' }}
+          VITE_APPWRITE_COLLECTION_PROFILES: ${{ secrets.VITE_APPWRITE_COLLECTION_PROFILES || 'profiles' }}
+          VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS: ${{ secrets.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS || 'subscriptions' }}
+          VITE_APPWRITE_COLLECTION_PAYMENTS: ${{ secrets.VITE_APPWRITE_COLLECTION_PAYMENTS || 'payments' }}
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

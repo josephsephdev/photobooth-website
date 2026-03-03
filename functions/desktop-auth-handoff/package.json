@@ -1,0 +1,16 @@
+{
+  "name": "desktop-auth-handoff",
+  "version": "1.0.0",
+  "description": "Desktop auth handoff — create and exchange one-time codes for desktop app login",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "node-appwrite": "^14.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "cancel-xendit-subscription",
+  "version": "1.0.0",
+  "description": "Cancels a user subscription in Appwrite",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "node-appwrite": "^14.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}

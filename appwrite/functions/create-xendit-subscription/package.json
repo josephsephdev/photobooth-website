@@ -1,0 +1,9 @@
+{
+  "name": "create-xendit-subscription",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "node-appwrite": "^13.0.0"
+  }
+}

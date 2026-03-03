@@ -1,0 +1,251 @@
+@custom-variant dark (&:is(.dark *));
+
+/* ===== DSLRBooth Dark Theme Design System ===== */
+:root {
+  --font-size: 16px;
+
+  /* DSLRBooth Dark Theme — Primary palette */
+  --ev-bg-start: #0a0e14;
+  --ev-bg-end: #141820;
+  --ev-surface: #161b24;
+  --ev-surface-elevated: #1a1f2e;
+  --ev-surface-hover: #1c2230;
+  --ev-border: #2a3040;
+  --ev-border-accent: rgba(0, 212, 170, 0.3);
+  --ev-text-primary: #e8ecf1;
+  --ev-text-secondary: #8892a4;
+  --ev-text-muted: #5a6478;
+  --ev-accent: #00d4aa;
+  --ev-accent-hover: #00eabc;
+  --ev-accent-glow: rgba(0, 212, 170, 0.25);
+  --ev-cyan: #00bcd4;
+  --ev-magenta: #e040fb;
+  --ev-success: #22c55e;
+  --ev-danger: #ef4444;
+  --ev-warning: #f59e0b;
+  --ev-radius: 14px;
+  --ev-radius-sm: 10px;
+  --ev-radius-pill: 999px;
+
+  /* Shadows & Glows */
+  --ev-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --ev-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --ev-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Map to shadcn/Tailwind tokens */
+  --background: var(--ev-bg-start);
+  --foreground: var(--ev-text-primary);
+  --card: var(--ev-surface);
+  --card-foreground: var(--ev-text-primary);
+  --popover: var(--ev-surface-elevated);
+  --popover-foreground: var(--ev-text-primary);
+  --primary: var(--ev-accent);
+  --primary-foreground: #0a0e14;
+  --secondary: var(--ev-surface-elevated);
+  --secondary-foreground: var(--ev-text-primary);
+  --muted: var(--ev-surface);
+  --muted-foreground: var(--ev-text-secondary);
+  --accent: var(--ev-surface-elevated);
+  --accent-foreground: var(--ev-text-primary);
+  --destructive: var(--ev-danger);
+  --destructive-foreground: #ffffff;
+  --border: var(--ev-border);
+  --input: transparent;
+  --input-background: var(--ev-bg-start);
+  --switch-background: var(--ev-border);
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+  --ring: var(--ev-accent-glow);
+  --chart-1: var(--ev-accent);
+  --chart-2: var(--ev-cyan);
+  --chart-3: var(--ev-magenta);
+  --chart-4: var(--ev-success);
+  --chart-5: var(--ev-warning);
+  --radius: var(--ev-radius);
+  --sidebar: var(--ev-surface-elevated);
+  --sidebar-foreground: var(--ev-text-primary);
+  --sidebar-primary: var(--ev-accent);
+  --sidebar-primary-foreground: #0a0e14;
+  --sidebar-accent: var(--ev-surface-hover);
+  --sidebar-accent-foreground: var(--ev-text-primary);
+  --sidebar-border: var(--ev-border);
+  --sidebar-ring: var(--ev-accent-glow);
+}
+
+.dark {
+  --background: var(--ev-bg-start);
+  --foreground: var(--ev-text-primary);
+  --card: var(--ev-surface);
+  --card-foreground: var(--ev-text-primary);
+  --popover: var(--ev-surface-elevated);
+  --popover-foreground: var(--ev-text-primary);
+  --primary: var(--ev-accent);
+  --primary-foreground: #0a0e14;
+  --secondary: var(--ev-surface-elevated);
+  --secondary-foreground: var(--ev-text-primary);
+  --muted: var(--ev-surface);
+  --muted-foreground: var(--ev-text-secondary);
+  --accent: var(--ev-surface-elevated);
+  --accent-foreground: var(--ev-text-primary);
+  --destructive: var(--ev-danger);
+  --destructive-foreground: #ffffff;
+  --border: var(--ev-border);
+  --input: var(--ev-border);
+  --ring: var(--ev-accent-glow);
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+  --chart-1: var(--ev-accent);
+  --chart-2: var(--ev-cyan);
+  --chart-3: var(--ev-magenta);
+  --chart-4: var(--ev-success);
+  --chart-5: var(--ev-warning);
+  --sidebar: var(--ev-surface-elevated);
+  --sidebar-foreground: var(--ev-text-primary);
+  --sidebar-primary: var(--ev-accent);
+  --sidebar-primary-foreground: #0a0e14;
+  --sidebar-accent: var(--ev-surface-hover);
+  --sidebar-accent-foreground: var(--ev-text-primary);
+  --sidebar-border: var(--ev-border);
+  --sidebar-ring: var(--ev-accent-glow);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* DSLRBooth custom color tokens for Tailwind */
+  --color-ev-bg: var(--ev-bg-start);
+  --color-ev-bg-end: var(--ev-bg-end);
+  --color-ev-surface: var(--ev-surface);
+  --color-ev-surface-elevated: var(--ev-surface-elevated);
+  --color-ev-surface-hover: var(--ev-surface-hover);
+  --color-ev-border: var(--ev-border);
+  --color-ev-border-accent: var(--ev-border-accent);
+  --color-ev-text-primary: var(--ev-text-primary);
+  --color-ev-text-secondary: var(--ev-text-secondary);
+  --color-ev-text-muted: var(--ev-text-muted);
+  --color-ev-accent: var(--ev-accent);
+  --color-ev-accent-hover: var(--ev-accent-hover);
+  --color-ev-cyan: var(--ev-cyan);
+  --color-ev-magenta: var(--ev-magenta);
+  --color-ev-success: var(--ev-success);
+  --color-ev-danger: var(--ev-danger);
+  --color-ev-warning: var(--ev-warning);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply text-foreground antialiased;
+    background: linear-gradient(155deg, var(--ev-bg-start), var(--ev-bg-end));
+    background-attachment: fixed;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom dark scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a3040;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #5a6478;
+  }
+
+  /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
