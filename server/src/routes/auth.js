@@ -8,6 +8,7 @@
 import { Router } from 'express';
 import crypto from 'node:crypto';
 import { promisify } from 'node:util';
+import { nanoid } from 'nanoid';
 import db from '../db/index.js';
 import { signToken, requireAuth } from '../middleware/auth.js';
 
@@ -91,13 +92,20 @@ router.post('/signin', async (req, res) => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  POST /api/auth/desktop-exchange                                   */
+/*  POST /api/auth/desktop-code                                       */
 /*                                                                    */
-/*  Called by the website frontend when `source=desktop`.              */
-/*  Find-or-create the user in SQLite, then return a JWT that the     */
-/*  desktop app can verify via GET /api/auth/me.                      */
+/*  Called by the website frontend after successful Appwrite auth      */
+/*  when `source=desktop`. Finds or creates the user in SQLite,       */
+/*  then returns a short-lived, one-time authorization code.          */
+/*                                                                    */
+/*  The website redirects to the desktop app callback with this code. */
+/*  The desktop app then exchanges it via POST /api/auth/desktop-     */
+/*  exchange to obtain a long-lived JWT.                              */
 /* ------------------------------------------------------------------ */
-router.post('/desktop-exchange', async (req, res) => {
+
+const AUTH_CODE_TTL_MINUTES = 5;
+
+router.post('/desktop-code', async (req, res) => {
   try {
     const { email, password, name } = req.body;
     if (!email || !password) {
@@ -110,7 +118,7 @@ router.post('/desktop-exchange', async (req, res) => {
       // User exists — verify password
       const valid = await verifyPassword(password, user.password_hash);
       if (!valid) {
-        // Password changed on website? Re-hash and update.
+        // Password changed on website side? Re-hash and update.
         const passwordHash = await hashPassword(password);
         db.prepare('UPDATE users SET password_hash = ?, updated_at = datetime(\'now\') WHERE id = ?')
           .run(passwordHash, user.id);
@@ -129,6 +137,77 @@ router.post('/desktop-exchange', async (req, res) => {
       user = { id: result.lastInsertRowid, email, name: displayName };
     }
 
+    // Clean up any expired codes for this user
+    db.prepare(
+      'DELETE FROM auth_codes WHERE user_id = ? OR expires_at < datetime(\'now\')',
+    ).run(user.id);
+
+    // Generate a short-lived, one-time auth code
+    const code = nanoid(48); // URL-safe, 48 chars
+    const expiresAt = new Date(Date.now() + AUTH_CODE_TTL_MINUTES * 60 * 1000).toISOString();
+
+    db.prepare(
+      'INSERT INTO auth_codes (code, user_id, expires_at) VALUES (?, ?, ?)',
+    ).run(code, user.id, expiresAt);
+
+    return res.json({ code });
+  } catch (err) {
+    console.error('desktop-code error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/*  POST /api/auth/desktop-exchange                                   */
+/*                                                                    */
+/*  Called by the desktop app to exchange a one-time auth code for a   */
+/*  long-lived JWT. The code is single-use and expires after 5 min.   */
+/*                                                                    */
+/*  Request:  { "code": "<one-time-code>" }                           */
+/*  Response: { "token": "JWT...", "user": { id, email, name } }      */
+/* ------------------------------------------------------------------ */
+router.post('/desktop-exchange', async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ error: 'Code is required' });
+    }
+
+    // Look up the auth code
+    const row = db.prepare(
+      'SELECT * FROM auth_codes WHERE code = ?',
+    ).get(code);
+
+    if (!row) {
+      return res.status(401).json({ error: 'Invalid or expired code' });
+    }
+
+    // Check if already used
+    if (row.used) {
+      // Delete the used code and reject
+      db.prepare('DELETE FROM auth_codes WHERE code = ?').run(code);
+      return res.status(401).json({ error: 'Code has already been used' });
+    }
+
+    // Check expiration
+    if (new Date(row.expires_at) < new Date()) {
+      db.prepare('DELETE FROM auth_codes WHERE code = ?').run(code);
+      return res.status(401).json({ error: 'Code has expired' });
+    }
+
+    // Mark the code as used and delete it (one-time)
+    db.prepare('DELETE FROM auth_codes WHERE code = ?').run(code);
+
+    // Look up the user
+    const user = db.prepare(
+      'SELECT id, email, name FROM users WHERE id = ?',
+    ).get(row.user_id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Issue a long-lived JWT for the desktop app
     const token = signToken(user);
     return res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
   } catch (err) {

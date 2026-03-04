@@ -6,7 +6,7 @@
 # Required repository secrets (Settings → Secrets → Actions):
 #   VITE_APPWRITE_ENDPOINT      — e.g. https://sgp.cloud.appwrite.io/v1
 #   VITE_APPWRITE_PROJECT_ID    — your Appwrite project ID
-#   VITE_APP_URL                — your GitHub Pages URL (e.g. https://yourusername.github.io/photobooth-website)
+#   VITE_APP_URL                — your site URL (e.g. https://luiscophotobooth.app)
 #
 # Optional (have defaults):
 #   VITE_APPWRITE_DATABASE_ID
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_BASE_PATH: /photobooth-website/
+          VITE_BASE_PATH: /
           VITE_APPWRITE_ENDPOINT: ${{ secrets.VITE_APPWRITE_ENDPOINT }}
           VITE_APPWRITE_PROJECT_ID: ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
           VITE_APPWRITE_DATABASE_ID: ${{ secrets.VITE_APPWRITE_DATABASE_ID || 'photobooth_db' }}
