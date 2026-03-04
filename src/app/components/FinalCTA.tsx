@@ -13,25 +13,22 @@ export function FinalCTA() {
 
   return (
     <section className="relative py-32 overflow-hidden">
-      {/* Dramatic background effects */}
+      {/* Background effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#00d4aa]/15 rounded-full blur-[150px] animate-pulse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00bcd4]/15 rounded-full blur-[150px] animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00d4aa]/10 rounded-full blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#00bcd4]/10 rounded-full blur-[80px]" />
       </div>
-
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
       <div className="relative max-w-5xl mx-auto px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#00d4aa]/10 to-[#00bcd4]/10 border border-[#00d4aa]/20 text-ev-accent text-sm font-medium backdrop-blur-sm mb-8">
-            <span className="w-2 h-2 rounded-full bg-ev-accent animate-pulse" />
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#00d4aa]/10 to-[#00bcd4]/10 border border-[#00d4aa]/20 text-ev-accent text-sm font-medium mb-8">
+            <span className="w-2 h-2 rounded-full bg-ev-accent" />
             Start Your Free Trial Today
           </span>
         </motion.div>
@@ -40,7 +37,7 @@ export function FinalCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
           className="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-ev-text-primary via-[#b0f0e0] to-[#a0e8f0] bg-clip-text text-transparent leading-tight"
         >
           Elevate Your Photobooth Business Today
@@ -50,7 +47,7 @@ export function FinalCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
           className="text-xl md:text-2xl text-ev-text-secondary mb-12 max-w-3xl mx-auto"
         >
           Download Luis&Co. Photobooth App and choose a subscription plan that works for you. Start creating unforgettable event experiences.
@@ -60,14 +57,14 @@ export function FinalCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
         >
           <Button
             size="lg"
             className="text-xl px-12 py-8 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-2xl shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
           >
-            <Download className="mr-3 h-6 w-6 group-hover:animate-bounce" />
+            <Download className="mr-3 h-6 w-6" />
             Download Now
             <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
           </Button>
@@ -87,7 +84,7 @@ export function FinalCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
           className="flex flex-wrap justify-center gap-6 mb-12"
         >
           {benefits.map((benefit, index) => (
@@ -102,7 +99,7 @@ export function FinalCTA() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.4, delay: 0.25 }}
           className="text-sm text-ev-text-muted"
         >
           Compatible with Windows · Secure payments via Xendit · Operated by LUIS&CO. ONLINE SHOP

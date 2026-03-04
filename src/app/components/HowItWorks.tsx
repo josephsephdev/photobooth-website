@@ -47,7 +47,7 @@ export function HowItWorks() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="text-center mb-20"
         >
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-ev-text-primary to-ev-text-secondary bg-clip-text text-transparent">
@@ -69,7 +69,7 @@ export function HowItWorks() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.3 }}
                 className="relative group"
               >
                 {/* Number badge */}
@@ -80,9 +80,7 @@ export function HowItWorks() {
                 </div>
 
                 {/* Card */}
-                <div className="relative mt-8 bg-gradient-to-br from-ev-surface/90 to-ev-surface-elevated/90 rounded-2xl p-8 pt-12 border border-ev-border group-hover:border-[rgba(0,212,170,0.3)] transition-all duration-300 backdrop-blur-sm min-h-[280px]">
-                  {/* Glow effect */}
-                  <div className={`absolute -inset-1 bg-gradient-to-br ${colorMap[step.color]} rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500`} />
+                <div className="relative mt-8 bg-gradient-to-br from-ev-surface/90 to-ev-surface-elevated/90 rounded-2xl p-8 pt-12 border border-ev-border group-hover:border-[rgba(0,212,170,0.3)] transition-colors duration-200 min-h-[280px]">
                   
                   <div className="relative">
                     {/* Icon */}

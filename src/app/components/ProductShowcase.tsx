@@ -31,7 +31,7 @@ export function ProductShowcase() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="text-center mb-20"
         >
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-ev-text-primary to-ev-text-secondary bg-clip-text text-transparent">
@@ -49,25 +49,22 @@ export function ProductShowcase() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.3 }}
               className="group relative"
             >
-              {/* Glow effect on hover */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#00d4aa] to-[#00bcd4] rounded-2xl opacity-0 group-hover:opacity-15 blur-xl transition-opacity duration-500" />
-              
-              <div className="relative bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl overflow-hidden border border-ev-border group-hover:border-[rgba(0,212,170,0.3)] transition-all duration-300 backdrop-blur-sm">
+              <div className="relative bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl overflow-hidden border border-ev-border group-hover:border-[rgba(0,212,170,0.3)] transition-colors duration-200">
                 {/* Image placeholder */}
                 <div className="relative h-64 overflow-hidden bg-ev-surface">
                   <ImageWithFallback
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ev-surface via-ev-surface/50 to-transparent" />
                   
                   {/* Icon overlay */}
                   <div className="absolute top-4 left-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 backdrop-blur-sm border border-ev-accent/30 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 border border-ev-accent/30 flex items-center justify-center">
                       <item.icon className="w-6 h-6 text-ev-accent" />
                     </div>
                   </div>
@@ -87,12 +84,10 @@ export function ProductShowcase() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.4 }}
           className="mt-20 relative"
         >
-          <div className="absolute -inset-4 bg-gradient-to-r from-[#00d4aa] via-[#00bcd4] to-[#00d4aa] rounded-3xl opacity-15 blur-3xl" />
-          
-          <div className="relative bg-gradient-to-br from-ev-surface-elevated/50 to-ev-surface/50 rounded-3xl border border-ev-border/50 backdrop-blur-sm p-6">
+          <div className="relative bg-gradient-to-br from-ev-surface-elevated/50 to-ev-surface/50 rounded-3xl border border-ev-border/50 p-6">
             <div className="aspect-[16/9] bg-gradient-to-br from-ev-surface to-[#141820] rounded-2xl flex items-center justify-center border border-ev-border/50">
               <div className="text-center max-w-md">
                 <div className="w-32 h-32 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 flex items-center justify-center border border-ev-accent/30">

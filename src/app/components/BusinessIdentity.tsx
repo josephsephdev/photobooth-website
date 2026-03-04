@@ -6,8 +6,8 @@ export function BusinessIdentity() {
     <section className="relative py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#00d4aa]/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-[#00bcd4]/5 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#00d4aa]/5 rounded-full blur-[80px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-[#00bcd4]/5 rounded-full blur-[80px]" />
       </div>
 
       <div className="relative max-w-5xl mx-auto px-6">
@@ -15,7 +15,7 @@ export function BusinessIdentity() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="text-center mb-16"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-ev-accent text-sm font-medium mb-6">
@@ -35,11 +35,10 @@ export function BusinessIdentity() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+          transition={{ duration: 0.4 }}
           className="relative mb-12"
         >
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#00d4aa] to-[#00bcd4] rounded-2xl opacity-10 blur-xl" />
-          <div className="relative bg-gradient-to-br from-ev-surface/90 to-ev-surface-elevated/90 rounded-2xl p-8 md:p-10 border border-ev-border backdrop-blur-sm">
+          <div className="relative bg-gradient-to-br from-ev-surface/90 to-ev-surface-elevated/90 rounded-2xl p-8 md:p-10 border border-ev-border">
             <div className="flex flex-col md:flex-row gap-8 items-start">
               <div className="flex-shrink-0">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-ev-accent/20 to-ev-cyan/20 flex items-center justify-center border border-ev-accent/30">
@@ -105,11 +104,10 @@ export function BusinessIdentity() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
+              transition={{ duration: 0.3 }}
               className="group relative"
             >
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#00d4aa] to-[#00bcd4] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500" />
-              <div className="relative bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-6 border border-ev-border group-hover:border-ev-accent/30 transition-all duration-300 backdrop-blur-sm h-full">
+              <div className="relative bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-6 border border-ev-border group-hover:border-ev-accent/30 transition-colors duration-200 h-full">
                 <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-[#00d4aa]/15 to-[#00bcd4]/15 mb-4">
                   <item.icon className="w-5 h-5 text-ev-accent" />
                 </div>
