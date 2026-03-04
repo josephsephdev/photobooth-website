@@ -49,7 +49,7 @@ router.post('/create-checkout', requireAuth, async (req, res) => {
       external_id: externalId,
       amount: plan.price / 100,                 // Xendit expects major units (₱700, not 70000 centavos)
       currency: plan.currency,
-      description: `${plan.name} — PhotoBooth Pro`,
+      description: `${plan.name} — Luis&Co. Photobooth App`,
       payer_email: user.email,
       customer: {
         given_names: user.name,

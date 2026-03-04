@@ -1,35 +1,52 @@
-import { Camera, Mail, Twitter, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Camera, Mail, ShieldCheck, Facebook, Instagram } from 'lucide-react';
+import { Link } from 'react-router';
 
 export function Footer() {
-  const footerLinks = {
-    Product: ['Features', 'Pricing', 'Download', 'Updates', 'FAQ'],
-    Resources: ['Documentation', 'Tutorials', 'Blog', 'Support', 'Community'],
-    Company: ['About Us', 'Careers', 'Partners', 'Press Kit', 'Contact'],
-    Legal: ['Privacy Policy', 'Terms of Service', 'License Agreement', 'Cookie Policy']
-  };
+  const productLinks = [
+    { label: 'Features', href: '/#features' },
+    { label: 'Pricing', to: '/pricing' },
+    { label: 'Download', href: '/#download' },
+    { label: 'How It Works', href: '/#how-it-works' },
+  ];
+
+  const legalLinks = [
+    { label: 'Privacy Policy', to: '/privacy-policy' },
+    { label: 'Terms and Conditions', to: '/terms-and-conditions' },
+    { label: 'Refund & Cancellation Policy', to: '/refund-policy' },
+  ];
+
+  const companyLinks = [
+    { label: 'About / Business Info', to: '/about' },
+    { label: 'Contact Us', to: '/about' },
+  ];
 
   const socialLinks = [
-    { icon: Twitter, href: '#', label: 'Twitter' },
     { icon: Facebook, href: '#', label: 'Facebook' },
     { icon: Instagram, href: '#', label: 'Instagram' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' }
   ];
 
   return (
     <footer className="relative border-t border-ev-border">
       <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
-          {/* Brand */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+          {/* Brand & Business Identity */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center">
                 <Camera className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-ev-text-primary">PhotoBooth Pro</span>
+              <span className="text-2xl font-bold text-ev-text-primary">Luis&Co. Photobooth App</span>
             </div>
-            <p className="text-ev-text-secondary mb-6 leading-relaxed">
-              Professional desktop photobooth application for unforgettable event experiences.
+            <p className="text-ev-text-secondary mb-4 leading-relaxed">
+              Professional desktop photobooth application for weddings, parties, corporate events, and more. Download the app and subscribe to start creating unforgettable photo experiences.
             </p>
+            <div className="flex items-start gap-2 mb-4 p-3 rounded-lg bg-ev-surface/60 border border-ev-border/50">
+              <ShieldCheck className="w-5 h-5 text-ev-accent flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-ev-text-primary">Operated by LUIS&CO. ONLINE SHOP</p>
+                <p className="text-xs text-ev-text-muted">DTI/BIR-Registered Business · Digital Apps & Subscriptions</p>
+              </div>
+            </div>
             <div className="flex gap-4">
               {socialLinks.map((social, index) => (
                 <a
@@ -44,24 +61,65 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Links */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="font-bold text-ev-text-primary mb-4">{category}</h3>
-              <ul className="space-y-3">
-                {links.map((link, index) => (
-                  <li key={index}>
-                    <a
-                      href="#"
+          {/* Product Links */}
+          <div>
+            <h3 className="font-bold text-ev-text-primary mb-4">Product</h3>
+            <ul className="space-y-3">
+              {productLinks.map((link, index) => (
+                <li key={index}>
+                  {link.to ? (
+                    <Link
+                      to={link.to}
                       className="text-ev-text-secondary hover:text-ev-accent transition-colors duration-300"
                     >
-                      {link}
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-ev-text-secondary hover:text-ev-accent transition-colors duration-300"
+                    >
+                      {link.label}
                     </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company Links */}
+          <div>
+            <h3 className="font-bold text-ev-text-primary mb-4">Company</h3>
+            <ul className="space-y-3">
+              {companyLinks.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    to={link.to}
+                    className="text-ev-text-secondary hover:text-ev-accent transition-colors duration-300"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h3 className="font-bold text-ev-text-primary mb-4">Legal</h3>
+            <ul className="space-y-3">
+              {legalLinks.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    to={link.to}
+                    className="text-ev-text-secondary hover:text-ev-accent transition-colors duration-300"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Newsletter */}
@@ -86,15 +144,20 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-ev-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-ev-text-muted text-sm">
-            © {new Date().getFullYear()} PhotoBooth Pro. All rights reserved.
-          </p>
-          <div className="flex gap-6 text-sm text-ev-text-muted">
-            <a href="#" className="hover:text-ev-accent transition-colors">Privacy</a>
-            <a href="#" className="hover:text-ev-accent transition-colors">Terms</a>
-            <a href="#" className="hover:text-ev-accent transition-colors">Cookies</a>
+        <div className="border-t border-ev-border pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+            <p className="text-ev-text-muted text-sm">
+              © {new Date().getFullYear()} Luis&Co. Photobooth App. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm text-ev-text-muted">
+              <Link to="/privacy-policy" className="hover:text-ev-accent transition-colors">Privacy Policy</Link>
+              <Link to="/terms-and-conditions" className="hover:text-ev-accent transition-colors">Terms</Link>
+              <Link to="/refund-policy" className="hover:text-ev-accent transition-colors">Refund Policy</Link>
+            </div>
           </div>
+          <p className="text-center text-xs text-ev-text-muted/70">
+            Operated by LUIS&CO. ONLINE SHOP · Digital Apps & Subscriptions · luiscophotobooth.app
+          </p>
         </div>
       </div>
     </footer>

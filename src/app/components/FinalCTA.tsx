@@ -1,12 +1,13 @@
 import { motion } from 'motion/react';
 import { Download, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { Link } from 'react-router';
 
 export function FinalCTA() {
   const benefits = [
-    "Free 30-day trial",
-    "No credit card required",
+    "Flexible subscription plans",
     "Full feature access",
+    "Regular updates included",
     "Setup in minutes"
   ];
 
@@ -42,7 +43,7 @@ export function FinalCTA() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-ev-text-primary via-[#b0f0e0] to-[#a0e8f0] bg-clip-text text-transparent leading-tight"
         >
-          Ready to Elevate Your Photobooth Business?
+          Elevate Your Photobooth Business Today
         </motion.h2>
 
         <motion.p
@@ -52,7 +53,7 @@ export function FinalCTA() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-xl md:text-2xl text-ev-text-secondary mb-12 max-w-3xl mx-auto"
         >
-          Join thousands of professionals creating unforgettable event experiences with our premium photobooth app
+          Download Luis&Co. Photobooth App and choose a subscription plan that works for you. Start creating unforgettable event experiences.
         </motion.p>
 
         <motion.div
@@ -67,8 +68,18 @@ export function FinalCTA() {
             className="text-xl px-12 py-8 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-2xl shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
           >
             <Download className="mr-3 h-6 w-6 group-hover:animate-bounce" />
-            Download Now - It's Free
+            Download Now
             <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="text-xl px-12 py-8 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
+          >
+            <Link to="/pricing">
+              View Plans & Pricing
+            </Link>
           </Button>
         </motion.div>
 
@@ -94,7 +105,7 @@ export function FinalCTA() {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="text-sm text-ev-text-muted"
         >
-          Compatible with Windows and macOS • Instant download • No installation hassles
+          Compatible with Windows · Secure payments via Xendit · Operated by LUIS&CO. ONLINE SHOP
         </motion.div>
       </div>
 

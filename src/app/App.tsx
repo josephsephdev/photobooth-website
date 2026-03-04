@@ -6,6 +6,7 @@ import { Features } from './components/Features';
 import { HowItWorks } from './components/HowItWorks';
 import { WhyChoose } from './components/WhyChoose';
 import { Testimonials } from './components/Testimonials';
+import { BusinessIdentity } from './components/BusinessIdentity';
 import { FinalCTA } from './components/FinalCTA';
 import { Footer } from './components/Footer';
 import SignIn from './pages/SignIn';
@@ -16,6 +17,10 @@ import CheckoutSuccess from './pages/CheckoutSuccess';
 import CheckoutCancel from './pages/CheckoutCancel';
 import VerifyEmail from './pages/VerifyEmail';
 import VerifyEmailSent from './pages/VerifyEmailSent';
+import About from './pages/About';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import RefundPolicy from './pages/RefundPolicy';
 
 function LandingPage() {
   return (
@@ -27,6 +32,7 @@ function LandingPage() {
       <HowItWorks />
       <WhyChoose />
       <Testimonials />
+      <BusinessIdentity />
       <FinalCTA />
       <Footer />
     </div>
@@ -45,6 +51,10 @@ export default function App() {
       <Route path="/checkout/cancel" element={<CheckoutCancel />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      <Route path="/refund-policy" element={<RefundPolicy />} />
     </Routes>
   );
 }

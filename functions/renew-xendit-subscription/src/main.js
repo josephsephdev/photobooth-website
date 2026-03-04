@@ -50,7 +50,7 @@ export default async ({ req, res, log, error }) => {
       external_id: externalId,
       amount: plan.price / 100,
       currency: plan.currency,
-      description: `${plan.name} Renewal — PhotoBooth Pro`,
+      description: `${plan.name} Renewal — Luis&Co. Photobooth App`,
       payer_email: user.email,
       customer: {
         given_names: user.name || user.email.split('@')[0],

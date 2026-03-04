@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
-import { Download, Play } from 'lucide-react';
+import { Download, Play, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
+import { Link } from 'react-router';
 
 export function Hero() {
   return (
@@ -24,7 +25,7 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#00d4aa]/10 to-[#00bcd4]/10 border border-[#00d4aa]/20 text-ev-accent text-sm font-medium backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-ev-accent animate-pulse" />
-            The Future of Photobooths application is here
+            Professional Desktop Photobooth Software
           </span>
         </motion.div>
 
@@ -32,14 +33,22 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-ev-text-primary via-[#b0f0e0] to-[#a0e8f0] bg-clip-text text-transparent leading-tight"
+          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-gradient-to-r from-ev-text-primary via-[#b0f0e0] to-[#a0e8f0] bg-clip-text text-transparent leading-tight"
         >
-          Professional
+          Luis&Co.
           <br />
-          Photobooth
-          <br />
-          Made Simple
+          Photobooth App
         </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15 }}
+          className="text-sm md:text-base text-ev-text-muted mb-8 flex items-center justify-center gap-2"
+        >
+          <ShieldCheck className="w-4 h-4 text-ev-accent" />
+          Operated by <strong className="text-ev-text-secondary">LUIS&CO. ONLINE SHOP</strong> — DTI/BIR-Registered Business
+        </motion.p>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -47,7 +56,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-xl md:text-2xl text-ev-text-secondary mb-12 max-w-3xl mx-auto leading-relaxed"
         >
-          Transform any event into an unforgettable experience with our premium desktop photobooth application. Professional-grade features, instant outputs, and seamless workflow.
+          Transform any event into an unforgettable experience with our premium desktop photobooth application. Download the app, choose a subscription plan, and start capturing stunning photos at weddings, parties, and corporate events.
         </motion.p>
 
         <motion.div
@@ -64,12 +73,14 @@ export function Hero() {
             Download Now
           </Button>
           <Button
+            asChild
             size="lg"
             variant="outline"
             className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
           >
-            <Play className="mr-2 h-5 w-5" />
-            Watch Demo
+            <Link to="/pricing">
+              View Subscription Plans
+            </Link>
           </Button>
         </motion.div>
 

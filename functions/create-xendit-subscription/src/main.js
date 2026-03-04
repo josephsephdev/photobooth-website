@@ -87,7 +87,7 @@ export default async ({ req, res, log, error }) => {
       external_id: externalId,
       amount: plan.price / 100, // Xendit expects major currency units
       currency: plan.currency,
-      description: `${plan.name} — PhotoBooth Pro`,
+      description: `${plan.name} — Luis&Co. Photobooth App`,
       payer_email: user.email,
       customer: {
         given_names: user.name || user.email.split('@')[0],

@@ -15,7 +15,7 @@ const plans = [
     price: '₱150',
     priceNote: 'one-time',
     description:
-      'Ideal for weddings, birthday parties, corporate gatherings, or any single-day event. Get full access to all PhotoBooth Pro features for 24 hours — no commitment, no hassle.',
+      'Ideal for weddings, birthday parties, corporate gatherings, or any single-day event. Get full access to all Luis&Co. Photobooth features for 24 hours \u2014 no commitment, no hassle.',
     features: [
       'Full feature access for 24 hours',
       'Unlimited photo captures',
@@ -117,7 +117,7 @@ export default function Pricing() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-[rgba(0,212,170,0.3)] group-hover:shadow-[rgba(0,212,170,0.5)] transition-shadow">
             <Camera className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-ev-text-primary">PhotoBooth Pro</span>
+          <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
         </Link>
       </div>
 
@@ -135,13 +135,16 @@ export default function Pricing() {
             Simple, transparent pricing
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-ev-text-primary mb-4 leading-tight">
-            Choose the plan that{' '}
+            Subscription Plans for{' '}
             <span className="bg-gradient-to-r from-ev-accent to-ev-cyan bg-clip-text text-transparent">
-              fits your needs
+              Luis&Co. Photobooth App
             </span>
           </h1>
-          <p className="text-ev-text-secondary text-lg">
-            Whether it's a single event or year-round coverage, we have the right plan to power your photobooth experience.
+          <p className="text-ev-text-secondary text-lg mb-3">
+            Choose a plan that fits your needs. All plans include full access to our professional desktop photobooth application with regular updates and support.
+          </p>
+          <p className="text-sm text-ev-text-muted">
+            Operated by LUIS&CO. ONLINE SHOP · Payments secured via Xendit
           </p>
         </motion.div>
 
@@ -287,10 +290,10 @@ export default function Pricing() {
           transition={{ duration: 0.5, delay: 0.7 }}
           className="text-center text-ev-text-muted text-sm mt-12 max-w-lg"
         >
-          All plans include access to our core photobooth features. Need a custom enterprise solution?{' '}
-          <button className="text-ev-accent hover:text-ev-accent-hover font-medium transition-colors">
-            Contact us
-          </button>
+          All plans include access to our core photobooth features. Payments are processed securely via Xendit.{' '}
+          <Link to="/about" className="text-ev-accent hover:text-ev-accent-hover font-medium transition-colors">
+            Learn more about our business
+          </Link>
         </motion.p>
       </div>
     </div>

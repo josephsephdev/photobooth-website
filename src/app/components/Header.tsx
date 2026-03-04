@@ -48,7 +48,7 @@ export function Header() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-ev-accent/30 group-hover:shadow-ev-accent/50 transition-shadow">
               <Camera className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-ev-text-primary">LM PhotoBooth</span>
+            <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
           </motion.a>
 
           {/* Desktop Navigation */}
