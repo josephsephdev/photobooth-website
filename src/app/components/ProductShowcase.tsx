@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Sparkles, Zap, Layers } from 'lucide-react';
+import { Sparkles, Zap, Layers, Play } from 'lucide-react';
 
 export function ProductShowcase() {
   const showcaseItems = [
@@ -53,7 +53,6 @@ export function ProductShowcase() {
               className="group relative"
             >
               <div className="relative bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl overflow-hidden border border-ev-border group-hover:border-[rgba(0,212,170,0.3)] transition-colors duration-200">
-                {/* Image placeholder */}
                 <div className="relative h-64 overflow-hidden bg-ev-surface">
                   <ImageWithFallback
                     src={item.image}
@@ -61,8 +60,7 @@ export function ProductShowcase() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ev-surface via-ev-surface/50 to-transparent" />
-                  
-                  {/* Icon overlay */}
+
                   <div className="absolute top-4 left-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 border border-ev-accent/30 flex items-center justify-center">
                       <item.icon className="w-6 h-6 text-ev-accent" />
@@ -79,7 +77,7 @@ export function ProductShowcase() {
           ))}
         </div>
 
-        {/* Large featured screenshot placeholder */}
+        {/* Large featured video demo */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -87,14 +85,26 @@ export function ProductShowcase() {
           transition={{ duration: 0.4 }}
           className="mt-20 relative"
         >
-          <div className="relative bg-gradient-to-br from-ev-surface-elevated/50 to-ev-surface/50 rounded-3xl border border-ev-border/50 p-6">
-            <div className="aspect-[16/9] bg-gradient-to-br from-ev-surface to-[#141820] rounded-2xl flex items-center justify-center border border-ev-border/50">
-              <div className="text-center max-w-md">
-                <div className="w-32 h-32 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 flex items-center justify-center border border-ev-accent/30">
-                  <Layers className="w-16 h-16 text-ev-accent" />
+          <div className="relative bg-gradient-to-br from-ev-surface-elevated/50 to-ev-surface/50 rounded-3xl border border-ev-border/50 p-6 shadow-2xl">
+            <div className="relative overflow-hidden rounded-2xl border border-ev-border/50 bg-black">
+              <video
+                className="w-full aspect-[16/9] object-cover"
+                src="/videos/full-app-demo.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls
+              >
+                Your browser does not support the video tag.
+              </video>
+
+              {/* Optional overlay label */}
+              <div className="absolute top-4 left-4">
+                <div className="inline-flex items-center gap-2 rounded-full bg-black/50 backdrop-blur-md px-4 py-2 border border-white/10">
+                  <Play className="w-4 h-4 text-ev-accent" />
+                  <span className="text-sm text-white font-medium">Full App Interface Preview</span>
                 </div>
-                <h3 className="text-2xl font-bold text-ev-text-primary mb-3">Full App Interface Preview</h3>
-                <p className="text-ev-text-muted">Replace with main dashboard screenshot or demo</p>
               </div>
             </div>
           </div>

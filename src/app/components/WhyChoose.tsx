@@ -71,7 +71,7 @@ export function WhyChoose() {
           >
             <div className="relative rounded-3xl overflow-hidden border border-ev-border">
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1764091319520-7507b5ad253a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWRkaW5nJTIwcmVjZXB0aW9uJTIwcGhvdG9ib290aCUyMGZ1bnxlbnwxfHx8fDE3NzIxOTEzOTF8MA&ixlib=rb-4.1.0&q=80&w=1080"
+                src="https://image2url.com/r2/default/images/1772629770914-d95a1be8-0786-4099-ba68-0dd88f506e4f.jpg"
                 alt="Event photobooth"
                 className="w-full h-full object-cover"
               />
