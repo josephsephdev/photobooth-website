@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Download, Play, ShieldCheck } from 'lucide-react';
+import { Download, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
 
@@ -68,19 +68,18 @@ export function Hero() {
             <Download className="mr-2 h-5 w-5" />
             Download Now
           </Button>
+
           <Button
             asChild
             size="lg"
             variant="outline"
             className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
           >
-            <Link to="/pricing">
-              View Subscription Plans
-            </Link>
+            <Link to="/pricing">View Subscription Plans</Link>
           </Button>
         </motion.div>
 
-        {/* Product preview placeholder */}
+        {/* Product preview video */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -88,16 +87,19 @@ export function Hero() {
           className="mt-20 relative"
         >
           <div className="relative mx-auto max-w-5xl">
-            {/* Placeholder for product screenshot */}
-            <div className="relative bg-gradient-to-br from-ev-surface/50 to-[#141820]/50 rounded-2xl border border-ev-border/50 p-4">
-              <div className="aspect-video bg-gradient-to-br from-ev-surface to-[#141820] rounded-xl flex items-center justify-center border border-ev-border/50">
-                <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 flex items-center justify-center border border-ev-accent/30">
-                    <Play className="w-12 h-12 text-ev-accent" />
-                  </div>
-                  <p className="text-ev-text-muted">Product Preview / Demo Video</p>
-                  <p className="text-sm text-ev-text-muted/60 mt-2">Replace with actual app screenshot or video</p>
-                </div>
+            <div className="relative bg-gradient-to-br from-ev-surface/50 to-[#141820]/50 rounded-2xl border border-ev-border/50 p-4 shadow-2xl">
+              <div className="relative overflow-hidden rounded-xl border border-ev-border/50 bg-black">
+                <video
+                  className="w-full aspect-video object-cover"
+                  src="/videos/showcase.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                >
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
           </div>

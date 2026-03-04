@@ -14,7 +14,7 @@ export function ProductShowcase() {
       title: "Google Drive Integration",
       description: "Securely back up event photos to your Google Drive for easy access and sharing",
       icon: Zap,
-      image: "https://images.unsplash.com/photo-1745847768366-d44dcef9ef35?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwaG90b2dyYXBoeSUyMHN0dWRpbyUyMGNhbWVyYXxlbnwxfHx8fDE3NzIxOTEzODl8MA&ixlib=rb-4.1.0&q=80&w=1080"
+      image: "https://image2url.com/r2/default/images/1772618293909-8fd83e07-e600-4e44-b751-5463115e8a84.png"
     },
     {
       title: "Advanced Features",
