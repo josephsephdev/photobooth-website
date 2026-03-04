@@ -8,19 +8,19 @@ export function ProductShowcase() {
       title: "Intuitive Interface",
       description: "Modern, easy-to-use dashboard designed for speed and efficiency",
       icon: Layers,
-      image: "https://images.unsplash.com/photo-1770012977129-19f856a1f935?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB0ZWNobm9sb2d5JTIwaW50ZXJmYWNlJTIwZGFya3xlbnwxfHx8fDE3NzIxOTEzOTB8MA&ixlib=rb-4.1.0&q=80&w=1080"
+      image: "https://image2url.com/r2/default/images/1772631567340-e7ac919d-7032-481b-9231-4b8d2f41402d.jpg"
     },
     {
       title: "Google Drive Integration",
       description: "Securely back up event photos to your Google Drive for easy access and sharing",
       icon: Zap,
-      image: "https://image2url.com/r2/default/images/1772618293909-8fd83e07-e600-4e44-b751-5463115e8a84.png"
+      image: "https://image2url.com/r2/default/images/1772632931370-ba4c32f2-59bb-4493-8872-c0cdf612e593.png"
     },
     {
       title: "Advanced Features",
       description: "Professional tools that make your photobooth stand out",
       icon: Sparkles,
-      image: "https://images.unsplash.com/photo-1569100922030-8dedef93800e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbnN0YW50JTIwcGhvdG8lMjBwcmludGVyJTIwcG9sYXJvaWR8ZW58MXx8fHwxNzcyMTkxMzkxfDA&ixlib=rb-4.1.0&q=80&w=1080"
+      image: "https://image2url.com/r2/default/images/1772633637891-3c109d24-0e64-4808-b0b7-0d8e2f37a03b.png"
     }
   ];
 
