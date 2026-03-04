@@ -111,7 +111,7 @@ export function WhyChoose() {
           className="grid md:grid-cols-3 gap-8"
         >
           {[
-            { value: "10,000+", label: "Events Powered" },
+            { value: "New", label: "Early Access Available" },
             { value: "99.9%", label: "Uptime Reliability" },
             { value: "5 sec", label: "Average Processing Time" }
           ].map((stat, index) => (

@@ -105,9 +105,9 @@ export function Testimonials() {
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
           {[
-            { value: "4.9/5", label: "Average Rating" },
-            { value: "2,500+", label: "Happy Customers" },
-            { value: "50,000+", label: "Events Hosted" },
+            { value: "Simple", label: "Easy Event Setup" },
+            { value: "Modern Events", label: "Designed to help photobooth businesses" },
+            { value: "Reliable", label: "Designed for Live Use" },
             { value: "24/7", label: "Support Available" }
           ].map((stat, index) => (
             <div key={index} className="text-center">
