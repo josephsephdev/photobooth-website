@@ -21,8 +21,11 @@ export default function VerifyEmail() {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    const userId = searchParams.get('userId');
-    const secret = searchParams.get('secret');
+    // HashRouter puts params in the hash query; also check window.location.search
+    // as a fallback for when the URL hasn't been redirected yet.
+    const fallbackParams = new URLSearchParams(window.location.search);
+    const userId = searchParams.get('userId') || fallbackParams.get('userId');
+    const secret = searchParams.get('secret') || fallbackParams.get('secret');
 
     if (!userId || !secret) {
       setErrorMsg('Invalid verification link. Missing userId or secret.');
@@ -84,14 +87,14 @@ export default function VerifyEmail() {
                 </div>
                 <h1 className="text-2xl font-bold text-ev-text-primary mb-2">Email Verified!</h1>
                 <p className="text-ev-text-secondary text-sm mb-6">
-                  Your email has been successfully verified. You're all set!
+                  Your email has been successfully verified. You can now sign in to your account.
                 </p>
                 <div className="flex flex-col gap-3">
                   <Button
                     asChild
                     className="w-full bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] hover:shadow-[rgba(0,212,170,0.4)] transition-all duration-300"
                   >
-                    <Link to="/account">Go to Dashboard</Link>
+                    <Link to="/signin">Sign In</Link>
                   </Button>
                   <Button
                     asChild

@@ -100,6 +100,12 @@ async function handleCreateCode({ req, res, log, error, databases, users, DATABA
     const user = await users.get(userId);
     log(`create-code: got user ${user.email}`);
 
+    // Block unverified users from getting a desktop auth code
+    if (!user.emailVerification) {
+      log(`create-code: blocked unverified user ${user.email}`);
+      return res.json({ ok: false, error: 'Please verify your email address before signing in to the desktop app.' }, 403);
+    }
+
     // Clean up any existing unused codes for this user
     try {
       const existing = await databases.listDocuments(DATABASE_ID, COLLECTION, [
@@ -184,6 +190,13 @@ async function handleExchangeCode({ req, res, log, error, databases, users, clie
 
     // Fetch the user from Appwrite Auth
     const user = await users.get(doc.userId);
+
+    // Block unverified users (defense in depth)
+    if (!user.emailVerification) {
+      await databases.deleteDocument(DATABASE_ID, COLLECTION, doc.$id);
+      log(`exchange-code: blocked unverified user ${user.email}`);
+      return res.json({ ok: false, error: 'Please verify your email address before signing in to the desktop app.' }, 403);
+    }
 
     // Create a short-lived token (JWT) for the desktop app.
     // Appwrite Users.createToken() generates a server-side secret that the

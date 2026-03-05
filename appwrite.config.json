@@ -189,6 +189,25 @@
                 "documents.write"
             ],
             "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "cleanup-unverified-users",
+            "name": "cleanup-unverified-users",
+            "runtime": "node-22",
+            "path": "functions/cleanup-unverified-users",
+            "entrypoint": "src/main.js",
+            "execute": [],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "0 0 * * *",
+            "timeout": 30,
+            "commands": "npm install",
+            "scopes": [
+                "users.read",
+                "users.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
         }
     ],
     "tablesDB": [

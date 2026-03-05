@@ -25,6 +25,7 @@ import {
   getCurrentUser,
   sendVerificationEmail,
   completeVerification as authCompleteVerification,
+  createUserProfile,
   type AppwriteUser,
 } from '../lib/auth.service';
 
@@ -76,10 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = !!user;
 
-  // Restore session on mount — Appwrite checks its session cookie automatically
+  // Restore session on mount — only treat VERIFIED users as authenticated
   useEffect(() => {
     getCurrentUser()
-      .then((u) => { if (u) setUser(mapUser(u)); })
+      .then((u) => { if (u && u.emailVerification) setUser(mapUser(u)); })
       .catch(() => { /* no session */ })
       .finally(() => setLoading(false));
   }, []);
@@ -97,8 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(async (email: string, password: string, fullName: string) => {
     await createAccount({ email, password, fullName });
-    const u = await getCurrentUser();
-    if (u) setUser(mapUser(u));
+    // User is NOT signed in after signup — they must verify email first
   }, []);
 
   const signOut = useCallback(async () => {
@@ -112,6 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const completeVerification = useCallback(async (userId: string, secret: string) => {
     await authCompleteVerification(userId, secret);
+    // Create profile now that the user is verified
+    const u = await getCurrentUser();
+    if (u && u.emailVerification) {
+      await createUserProfile(u.$id, u.name, u.email);
+    }
     // Refresh user to pick up emailVerification = true
     await refreshUser();
   }, [refreshUser]);

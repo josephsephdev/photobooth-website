@@ -65,6 +65,12 @@ async function handleCreateCode({ req, res, log, error, databases, users, DATABA
   try {
     const user = await users.get(userId);
 
+    // Block unverified users from getting a desktop auth code
+    if (!user.emailVerification) {
+      log(`create-code: blocked unverified user ${user.email}`);
+      return res.json({ ok: false, error: 'Please verify your email address before signing in to the desktop app.' }, 403);
+    }
+
     try {
       const existing = await databases.listDocuments(DATABASE_ID, COLLECTION, [
         Query.equal('userId', userId),
@@ -130,6 +136,14 @@ async function handleExchangeCode({ req, res, log, error, databases, users, clie
     await databases.updateDocument(DATABASE_ID, COLLECTION, doc.$id, { used: true });
 
     const user = await users.get(doc.userId);
+
+    // Block unverified users (defense in depth)
+    if (!user.emailVerification) {
+      await databases.deleteDocument(DATABASE_ID, COLLECTION, doc.$id);
+      log(`exchange-code: blocked unverified user ${user.email}`);
+      return res.json({ ok: false, error: 'Please verify your email address before signing in to the desktop app.' }, 403);
+    }
+
     const tokenResult = await users.createToken(doc.userId);
 
     log(`exchange-code: code exchanged for user=${doc.userId}`);

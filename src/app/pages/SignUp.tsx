@@ -102,21 +102,8 @@ export default function SignUp() {
       }
       await signUp(email, password, fullName.trim());
 
-      // ── Desktop app callback ──────────────────────────────────
-      if (isDesktop) {
-        try {
-          const code = await createDesktopAuthCode();
-          if (code) {
-            window.location.href = `${redirect}?code=${encodeURIComponent(code)}`;
-            return;
-          }
-        } catch (exchangeErr) {
-          console.error('Desktop auth code generation failed:', exchangeErr);
-        }
-      }
-
-      // Redirect to a "check your email" page after successful signup
-      navigate('/verify-email-sent');
+      // Redirect to "check your email" page — user must verify before signing in
+      navigate('/verify-email-sent', { state: { email } });
     } catch (err: any) {
       setError(err.message || 'Sign up failed');
     } finally {

@@ -36,9 +36,13 @@ export interface SignUpParams {
  *
  * Flow:
  *  1. account.create()           — register user in Appwrite Auth
- *  2. account.createEmailPasswordSession() — log the user in immediately
- *  3. createUserProfile()        — write a profile document to the database
- *  4. sendVerificationEmail()    — send "verify your email" email
+ *  2. account.createEmailPasswordSession() — session needed for verification email + link
+ *  3. sendVerificationEmail()    — send "verify your email" email
+ *
+ * NOTE: Session is kept active so `updateVerification` works when the user
+ *       clicks the verification link. The AuthContext does NOT treat unverified
+ *       users as authenticated, so the session alone doesn't grant access.
+ *       Profile document is only created after email verification is complete.
  */
 export async function createAccount({ email, password, fullName }: SignUpParams) {
   // 1. Create the Appwrite user
@@ -49,13 +53,10 @@ export async function createAccount({ email, password, fullName }: SignUpParams)
     fullName,
   );
 
-  // 2. Create an email/password session so the user is logged in
+  // 2. Create a session (needed for sending verification + completing it later)
   await account.createEmailPasswordSession(email, password);
 
-  // 3. Create a profile document in the database
-  await createUserProfile(newUser.$id, fullName, email);
-
-  // 4. Send email verification
+  // 3. Send email verification
   await sendVerificationEmail();
 
   return newUser;
@@ -63,9 +64,21 @@ export async function createAccount({ email, password, fullName }: SignUpParams)
 
 /**
  * Sign in with email + password.
+ * Blocks unverified users — they must verify their email first.
  */
 export async function signIn(email: string, password: string) {
+  // Clear any stale session (e.g. leftover from signup before verification)
+  try { await account.deleteSession('current'); } catch { /* no session — fine */ }
+
   const session = await account.createEmailPasswordSession(email, password);
+
+  // Check that the user's email is verified
+  const user = await account.get();
+  if (!user.emailVerification) {
+    await account.deleteSession('current');
+    throw new Error('Please verify your email address before signing in. Check your inbox for a verification link.');
+  }
+
   return session;
 }
 
@@ -108,17 +121,16 @@ export async function completeVerification(userId: string, secret: string) {
 // ── Profile Helper ─────────────────────────────────────────────────
 
 /**
- * Create a profile document for a new user.
+ * Create a profile document for a verified user.
+ *
+ * Called after email verification is complete — only verified users
+ * get a profile document in the database.
  *
  * Document permissions:
  *   - Read:  user:{userId}   (only the owner can read)
  *   - Write: user:{userId}   (only the owner can update)
- *
- * NOTE: In production you'll likely also want server-side write access
- *       via Appwrite Functions (for admin or webhook-driven updates).
- *       Configure that through collection-level permissions in the Console.
  */
-async function createUserProfile(userId: string, fullName: string, email: string) {
+export async function createUserProfile(userId: string, fullName: string, email: string) {
   const now = new Date().toISOString();
 
   await databases.createDocument(

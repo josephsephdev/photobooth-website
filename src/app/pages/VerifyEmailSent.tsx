@@ -1,31 +1,17 @@
 /**
  * VerifyEmailSent — shown immediately after signup.
  * Tells the user to check their email for a verification link.
+ * User is NOT signed in at this point — they must verify first.
  */
 
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, Mail, RefreshCw } from 'lucide-react';
+import { Camera, Mail, ExternalLink } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { useAuth } from '../context/AuthContext';
-import { useState } from 'react';
 
 export default function VerifyEmailSent() {
-  const { user, sendVerification } = useAuth();
-  const [resending, setResending] = useState(false);
-  const [resent, setResent] = useState(false);
-
-  const handleResend = async () => {
-    setResending(true);
-    try {
-      await sendVerification();
-      setResent(true);
-    } catch {
-      // Ignore — Appwrite may rate-limit
-    } finally {
-      setResending(false);
-    }
-  };
+  const location = useLocation();
+  const email = (location.state as { email?: string })?.email;
 
   return (
     <div className="min-h-screen text-ev-text-primary flex flex-col">
@@ -60,34 +46,36 @@ export default function VerifyEmailSent() {
             </div>
 
             <h1 className="text-2xl font-bold text-ev-text-primary mb-2">
-              Check your email
+              Verify your email address
             </h1>
             <p className="text-ev-text-secondary text-sm mb-2">
               We've sent a verification link to:
             </p>
-            {user?.email && (
-              <p className="text-ev-accent font-medium text-sm mb-6">{user.email}</p>
+            {email && (
+              <p className="text-ev-accent font-medium text-sm mb-6">{email}</p>
             )}
             <p className="text-ev-text-muted text-xs mb-6">
-              Click the link in the email to verify your account. If you don't see it, check your spam folder.
+              Click the link in the email to verify your account. Once verified, you can sign in. If you don't see it, check your spam folder.
             </p>
 
             <div className="flex flex-col gap-3">
               <Button
-                onClick={handleResend}
-                disabled={resending || resent}
-                variant="outline"
-                className="w-full border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary transition-all gap-2"
+                asChild
+                className="w-full bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] hover:shadow-[rgba(0,212,170,0.4)] transition-all duration-300 gap-2"
               >
-                <RefreshCw className={`w-4 h-4 ${resending ? 'animate-spin' : ''}`} />
-                {resent ? 'Email Sent!' : resending ? 'Sending…' : 'Resend Verification Email'}
+                <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
+                  <Mail className="w-4 h-4" />
+                  Open Gmail
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </Button>
 
               <Button
                 asChild
-                className="w-full bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] hover:shadow-[rgba(0,212,170,0.4)] transition-all duration-300"
+                variant="outline"
+                className="w-full border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary transition-all"
               >
-                <Link to="/account">Continue to Dashboard</Link>
+                <Link to="/signin">Sign In</Link>
               </Button>
 
               <Button

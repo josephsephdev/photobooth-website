@@ -43,7 +43,7 @@ export async function createDesktopAuthCode(): Promise<string | null> {
   const data = JSON.parse(execution.responseBody);
   if (!data.ok || !data.code) {
     console.error('[DesktopAuth] Unexpected response:', data);
-    return null;
+    throw new Error(data.error || 'Failed to generate desktop auth code');
   }
 
   return data.code;
