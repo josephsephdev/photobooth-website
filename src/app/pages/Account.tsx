@@ -389,8 +389,23 @@ export default function Account() {
                         <span className="font-medium text-ev-text-primary sm:text-right text-xs sm:text-sm">
                           {item.currency === 'PHP' ? '₱' : item.currency}{(item.amount / 100).toLocaleString()}
                         </span>
-                        <span className="sm:text-right">
+                        <span className="sm:text-right flex items-center gap-2 justify-end">
                           <StatusBadge status={item.status} />
+                          {(item.status === 'pending' || item.status === 'superseded') && (
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              className="border-ev-border hover:border-ev-danger/50 bg-ev-surface/30 hover:bg-ev-danger/10 text-ev-text-primary hover:text-ev-danger transition-all"
+                              onClick={async () => {
+                                await cancelPayment(item.$id);
+                                // Refresh payment history
+                                if (user) setPayments(await getUserPayments(user.id));
+                              }}
+                            >
+                              <XCircle className="w-3 h-3 mr-1" />
+                              Cancel
+                            </Button>
+                          )}
                         </span>
                       </div>
                     );
@@ -420,16 +435,69 @@ export default function Account() {
               </div>
               <Button
                 onClick={handleSignOut}
-                variant="outline"
-                className="border-ev-danger/40 hover:border-ev-danger bg-ev-surface/30 hover:bg-ev-danger/10 text-ev-danger font-medium gap-2 transition-all shrink-0"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </Button>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                // ...existing code...
+
+                // Cancel payment function
+                async function cancelPayment(paymentId: string) {
+                  try {
+                    // Call Appwrite function endpoint
+                    const response = await fetch('https://cloud.appwrite.io/v1/functions/cancel-xendit-payment/execution', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'X-Appwrite-Project': import.meta.env.VITE_APPWRITE_PROJECT_ID,
+                        'X-Appwrite-Response-Format': 'json',
+                      },
+                      body: JSON.stringify({ paymentId }),
+                      credentials: 'include',
+                    });
+                    const result = await response.json();
+                    if (!response.ok || result.error) {
+                      alert(result.error || 'Failed to cancel payment.');
+                    }
+                  } catch (err) {
+                    alert('Error cancelling payment.');
+                  }
+                }
+
+                return (
+                  <div className="min-h-screen text-ev-text-primary flex flex-col">
+                    {/* Background effects */}
+                    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#00d4aa]/6 rounded-full blur-3xl" />
+                      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#00bcd4]/6 rounded-full blur-3xl" />
+                    </div>
+
+                    {/* Header bar */}
+                    <div className="relative z-10 px-6 pt-8 pb-2 flex items-center justify-between">
+                      <Link to="/" className="inline-flex items-center gap-3 group">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-[rgba(0,212,170,0.3)] group-hover:shadow-[rgba(0,212,170,0.5)] transition-shadow">
+                          <Camera className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
+                      </Link>
+
+                      <Button
+                        onClick={handleSignOut}
+                        variant="ghost"
+                        className="text-ev-text-secondary hover:text-ev-danger hover:bg-ev-danger/10 transition-colors gap-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </Button>
+                    </div>
+
+                    {/* Content */}
+                    <div className="relative z-10 flex-1 w-full max-w-5xl mx-auto px-6 py-10">
+                      {/* Page heading */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                        className="mb-10"
+                      >
+                        <h1 className="text-3xl md:text-4xl font-bold text-ev-text-primary mb-2">Account Dashboard</h1>
+                        <p className="text-ev-text-secondary">
+                          Manage your account, subscription, and billing details.
+                        </p>
+                      </motion.div>
