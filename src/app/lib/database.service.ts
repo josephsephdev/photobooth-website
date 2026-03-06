@@ -48,8 +48,11 @@ export interface SubscriptionDocument extends Models.Document {
 
 export interface PaymentDocument extends Models.Document {
   userId: string;
+  planId: string;
   subscriptionId: string;
   providerPaymentId: string;
+  xenditInvoiceId: string;
+  checkoutUrl: string;
   amount: number;
   currency: string;
   status: string;

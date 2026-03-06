@@ -47,8 +47,11 @@ export const SUBSCRIPTION_FIELDS = {
 // ── Payment Fields ─────────────────────────────────────────────────
 export const PAYMENT_FIELDS = {
   USER_ID:             'userId',
+  PLAN_ID:             'planId',
   SUBSCRIPTION_ID:     'subscriptionId',
   PROVIDER_PAYMENT_ID: 'providerPaymentId',
+  XENDIT_INVOICE_ID:   'xenditInvoiceId',
+  CHECKOUT_URL:        'checkoutUrl',
   AMOUNT:              'amount',
   CURRENCY:            'currency',
   STATUS:              'status',
@@ -69,11 +72,12 @@ export const SUBSCRIPTION_STATUS = {
 
 // ── Payment Statuses ───────────────────────────────────────────────
 export const PAYMENT_STATUS = {
-  PAID:    'paid',
-  PENDING: 'pending',
-  FAILED:  'failed',
-  EXPIRED: 'expired',
-  REFUNDED:'refunded',
+  PAID:       'paid',
+  PENDING:    'pending',
+  FAILED:     'failed',
+  EXPIRED:    'expired',
+  SUPERSEDED: 'superseded',
+  REFUNDED:   'refunded',
 } as const;
 
 // ── Roles ──────────────────────────────────────────────────────────

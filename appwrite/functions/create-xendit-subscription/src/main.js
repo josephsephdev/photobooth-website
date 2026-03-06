@@ -6,9 +6,17 @@
  * Flow:
  *  1. Authenticate the calling user (Appwrite passes the JWT automatically)
  *  2. Validate the requested planId
- *  3. Call the Xendit Invoice API to create a hosted checkout page
- *  4. Store a pending payment record in Appwrite database
- *  5. Return the Xendit checkout URL to the frontend
+ *  3. Check for existing pending payments for this user:
+ *     - Same plan + still valid  → reuse the existing Xendit checkout URL
+ *     - Different plan           → expire old invoice on Xendit, supersede record, create new
+ *     - Expired pending          → mark expired, create new checkout
+ *  4. Call the Xendit Invoice API to create a hosted checkout page
+ *  5. Store a pending payment record in Appwrite database
+ *  6. Return the Xendit checkout URL to the frontend
+ *
+ * Business rules:
+ *  • Only ONE active pending checkout per user at any time.
+ *  • Subscription is NEVER activated here — only by the webhook handler.
  *
  * Environment variables (set in Appwrite Console → Function → Settings):
  *   APPWRITE_ENDPOINT         — e.g. https://cloud.appwrite.io/v1
@@ -21,7 +29,7 @@
  *   COLLECTION_SUBSCRIPTIONS   — e.g. subscriptions
  */
 
-import { Client, Databases, ID, Users } from 'node-appwrite';
+import { Client, Databases, ID, Users, Query } from 'node-appwrite';
 
 // ── Plan config (mirror of frontend plans — backend is source of truth) ──
 const PLANS = {
@@ -48,6 +56,44 @@ const PLANS = {
   },
 };
 
+// Xendit invoice lifetime in seconds (24 hours).
+// Sent to Xendit AND used locally to detect stale pending checkouts.
+const INVOICE_DURATION_SECONDS = 86400;
+
+/**
+ * Extract planId from an external_id string.
+ * Formats: pb_{planId}_{userId}_{ts}  or  pb_renew_{planId}_{userId}_{ts}
+ */
+function extractPlanId(externalId) {
+  const prefix = 'pb_';
+  if (!externalId || !externalId.startsWith(prefix)) return null;
+  let rest = externalId.slice(prefix.length);
+  if (rest.startsWith('renew_')) rest = rest.slice('renew_'.length);
+  const knownIds = Object.keys(PLANS).sort((a, b) => b.length - a.length);
+  for (const pid of knownIds) {
+    if (rest.startsWith(pid + '_')) return pid;
+  }
+  return null;
+}
+
+/**
+ * Expire a Xendit invoice so it can no longer be paid.
+ */
+async function expireXenditInvoice(xenditInvoiceId, xenditSecret, log) {
+  if (!xenditInvoiceId) return;
+  try {
+    await fetch(`https://api.xendit.co/invoices/${xenditInvoiceId}/expire!`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${Buffer.from(xenditSecret + ':').toString('base64')}`,
+      },
+    });
+    log(`Expired Xendit invoice ${xenditInvoiceId}`);
+  } catch (e) {
+    log(`Warning: could not expire Xendit invoice ${xenditInvoiceId}: ${e.message}`);
+  }
+}
+
 export default async function main({ req, res, log, error }) {
   try {
     // ── 1. Parse input ───────────────────────────────────────────
@@ -60,7 +106,6 @@ export default async function main({ req, res, log, error }) {
     }
 
     // ── 2. Get the calling user ──────────────────────────────────
-    // Appwrite injects the user's JWT; we use a server client to read user info
     const client = new Client()
       .setEndpoint(process.env.APPWRITE_ENDPOINT)
       .setProject(process.env.APPWRITE_PROJECT_ID)
@@ -69,7 +114,6 @@ export default async function main({ req, res, log, error }) {
     const users = new Users(client);
     const databases = new Databases(client);
 
-    // The calling user's ID is available via req.headers
     const userId = req.headers['x-appwrite-user-id'];
     if (!userId) {
       return res.json({ error: 'Authentication required' }, 401);
@@ -77,11 +121,49 @@ export default async function main({ req, res, log, error }) {
 
     const user = await users.get(userId);
 
-    // ── 3. Generate external ID ──────────────────────────────────
+    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
+    const DATABASE_ID = process.env.DATABASE_ID || 'photobooth_db';
+    const COLLECTION_PAYMENTS = process.env.COLLECTION_PAYMENTS || 'payments';
+
+    // ── 3. Handle existing pending payments ──────────────────────
+    // Enforce: only ONE active pending checkout per user at a time.
+    const pendingList = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_PAYMENTS,
+      [
+        Query.equal('userId', userId),
+        Query.equal('status', 'pending'),
+        Query.orderDesc('createdAt'),
+        Query.limit(25),
+      ],
+    );
+
+    for (const pending of pendingList.documents) {
+      const pendingPlanId = pending.planId || extractPlanId(pending.providerPaymentId);
+      const createdAt = new Date(pending.createdAt);
+      const invoiceExpiry = new Date(createdAt.getTime() + INVOICE_DURATION_SECONDS * 1000);
+      const isExpired = new Date() >= invoiceExpiry;
+
+      if (isExpired) {
+        await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, { status: 'expired' });
+        log(`Marked stale pending payment ${pending.$id} as expired`);
+        continue;
+      }
+
+      if (pendingPlanId === planId && pending.checkoutUrl) {
+        log(`Reusing existing pending checkout ${pending.$id} for plan ${planId}`);
+        return res.json({ checkoutUrl: pending.checkoutUrl, reused: true });
+      }
+
+      await expireXenditInvoice(pending.xenditInvoiceId, XENDIT_SECRET, log);
+      await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, { status: 'superseded' });
+      log(`Superseded pending payment ${pending.$id} (was ${pendingPlanId}, user now wants ${planId})`);
+    }
+
+    // ── 4. Generate external ID ──────────────────────────────────
     const externalId = `pb_${planId}_${userId}_${Date.now()}`;
 
-    // ── 4. Create Xendit Invoice ─────────────────────────────────
-    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
+    // ── 5. Create Xendit Invoice ─────────────────────────────────
     const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
     const invoicePayload = {
@@ -94,6 +176,7 @@ export default async function main({ req, res, log, error }) {
         given_names: user.name || user.email.split('@')[0],
         email: user.email,
       },
+      invoice_duration: INVOICE_DURATION_SECONDS,
       success_redirect_url: `${FRONTEND_URL}/#/checkout/success?ref=${externalId}`,
       failure_redirect_url: `${FRONTEND_URL}/#/checkout/cancel`,
       items: [
@@ -124,18 +207,18 @@ export default async function main({ req, res, log, error }) {
     const invoice = await xenditRes.json();
     log(`Xendit invoice created: ${invoice.id} for user ${userId}`);
 
-    // ── 5. Store pending payment in Appwrite database ────────────
-    const DATABASE_ID = process.env.DATABASE_ID || 'photobooth_db';
-    const COLLECTION_PAYMENTS = process.env.COLLECTION_PAYMENTS || 'payments';
-
+    // ── 6. Store pending payment in Appwrite database ────────────
     await databases.createDocument(
       DATABASE_ID,
       COLLECTION_PAYMENTS,
       ID.unique(),
       {
         userId: userId,
+        planId: planId,
         subscriptionId: '',
         providerPaymentId: externalId,
+        xenditInvoiceId: invoice.id,
+        checkoutUrl: invoice.invoice_url,
         amount: plan.price,
         currency: plan.currency,
         status: 'pending',
@@ -145,7 +228,7 @@ export default async function main({ req, res, log, error }) {
       },
     );
 
-    // ── 6. Return checkout URL ───────────────────────────────────
+    // ── 7. Return checkout URL ───────────────────────────────────
     return res.json({ checkoutUrl: invoice.invoice_url });
   } catch (err) {
     error(`create-xendit-subscription error: ${err.message}`);
