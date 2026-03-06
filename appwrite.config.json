@@ -208,6 +208,25 @@
                 "users.write"
             ],
             "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "cancel-xendit-payment",
+            "name": "cancel-xendit-payment",
+            "runtime": "node-22",
+            "path": "functions/cancel-xendit-payment",
+            "entrypoint": "src/main.js",
+            "execute": ["users"],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
         }
     ],
     "tablesDB": [
