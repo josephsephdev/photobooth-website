@@ -23,7 +23,7 @@ const PLANS = {
   yearly:     { id: 'yearly',     name: 'Studio Annual', price: 700000, currency: 'PHP', durationDays: 365 },
 };
 
-const INVOICE_DURATION_SECONDS = 86400;
+const INVOICE_DURATION_SECONDS = 1800;
 
 function extractPlanId(externalId) {
   const prefix = 'pb_';

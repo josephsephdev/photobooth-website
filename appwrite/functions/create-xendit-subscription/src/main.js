@@ -56,9 +56,9 @@ const PLANS = {
   },
 };
 
-// Xendit invoice lifetime in seconds (24 hours).
+// Xendit invoice lifetime in seconds (30 minutes).
 // Sent to Xendit AND used locally to detect stale pending checkouts.
-const INVOICE_DURATION_SECONDS = 86400;
+const INVOICE_DURATION_SECONDS = 1800;
 
 /**
  * Extract planId from an external_id string.
