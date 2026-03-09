@@ -11,6 +11,12 @@
 
 import { Client, Databases, ID, Query } from 'node-appwrite';
 
+const PLANS = {
+  event_pass: { id: 'event_pass', name: 'Event Pass', price: 15000, currency: 'PHP', durationDays: 1 },
+  monthly:    { id: 'monthly',    name: 'Pro Monthly', price: 70000, currency: 'PHP', durationDays: 30 },
+  yearly:     { id: 'yearly',     name: 'Studio Annual', price: 700000, currency: 'PHP', durationDays: 365 },
+};
+
 export default async ({ req, res, log, error }) => {
   try {
     const client = new Client()
@@ -68,8 +74,16 @@ export default async ({ req, res, log, error }) => {
           skipped++;
         }
       } else {
-        const parts = externalId.split('_');
-        const userId = parts.length >= 3 ? parts[2] : 'unknown';
+        // PHASE 3 FIX: Properly extract userId from external_id
+        // External ID format: pb_[planId]_[userId]_[timestamp]
+        // We cannot simply split on '_' because planId can contain '_' (e.g., "event_pass")
+        
+        const userId = extractUserIdFromExternalId(externalId, log);
+        if (userId === 'unknown') {
+          log(`Warning: Could not extract userId from external_id: ${externalId}; skipping record creation`);
+          skipped++;
+          continue;
+        }
 
         await databases.createDocument(
           DATABASE_ID,
@@ -98,6 +112,47 @@ export default async ({ req, res, log, error }) => {
     return res.json({ error: 'Internal server error' }, 500);
   }
 };
+
+/**
+ * PHASE 3 FIX: Properly extract userId from external_id.
+ * 
+ * External ID format:
+ *   pb_{planId}_{userId}_{timestamp}          – new purchase
+ *   pb_renew_{planId}_{userId}_{timestamp}    – renewal
+ *
+ * Plan IDs may contain underscores (e.g., "event_pass"), so we cannot
+ * simply split on "_". Instead we try each known plan ID (longest first).
+ */
+function extractUserIdFromExternalId(externalId, log) {
+  const prefix = 'pb_';
+  if (!externalId || !externalId.startsWith(prefix)) {
+    return 'unknown';
+  }
+
+  let rest = externalId.slice(prefix.length);
+
+  // Strip the renewal marker if present
+  if (rest.startsWith('renew_')) {
+    rest = rest.slice('renew_'.length);
+  }
+
+  // Try known plan IDs, longest first, so "event_pass" is matched before "event"
+  const knownIds = Object.keys(PLANS).sort((a, b) => b.length - a.length);
+  for (const planId of knownIds) {
+    if (rest.startsWith(planId + '_')) {
+      rest = rest.slice((planId + '_').length);
+      // Now rest = "{userId}_{timestamp}"
+      const parts = rest.split('_');
+      const userId = parts[0];
+      if (userId && userId.length > 0) {
+        return userId;
+      }
+    }
+  }
+
+  log(`Warning: Could not match any known plan in external_id: ${externalId}`);
+  return 'unknown';
+}
 
 function mapXenditStatus(xenditStatus) {
   const s = (xenditStatus || '').toUpperCase();

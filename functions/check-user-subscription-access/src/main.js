@@ -84,20 +84,15 @@ async function getSubscriptionAccessState(databases, databaseId, collectionId, u
 
 export default async ({ req, res, log, error }) => {
   try {
-    // Primary: use Appwrite-injected user ID (authenticated calls from website frontend)
-    let userId = req.headers['x-appwrite-user-id'];
-
-    // Fallback: accept userId from request body (unauthenticated calls from desktop app)
-    // The desktop app stores the Appwrite userId from the auth handoff and passes it directly.
-    if (!userId) {
-      let body;
-      try {
-        body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      } catch { /* ignore parse errors */ }
-      userId = body?.userId;
-    }
+    // PHASE 4 SECURITY FIX: Require proper authentication, do not accept userId from request body
+    // This prevents privacy leak where any caller could check any user's subscription status
+    
+    const userId = req.headers['x-appwrite-user-id'];
 
     if (!userId) {
+      // Return 401 if not authenticated
+      // Desktop app users should authenticate through desktop-auth-handoff first
+      // and either pass auth token OR implement their own secure mechanism
       return res.json(
         {
           hasAccess: false,
@@ -107,7 +102,7 @@ export default async ({ req, res, log, error }) => {
           planName: null,
           expiresAt: null,
           watermarkEnabled: true,
-          error: 'User ID required (authenticate or provide userId in body)',
+          error: 'Authentication required. Must use authenticated session (x-appwrite-user-id header).',
         },
         401,
       );

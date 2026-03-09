@@ -6,7 +6,10 @@
 
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is required. Set it in server/.env');
+}
 
 /**
  * Sign a JWT for a given user.

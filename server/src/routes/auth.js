@@ -15,6 +15,9 @@ import { signToken, requireAuth } from '../middleware/auth.js';
 const scrypt = promisify(crypto.scrypt);
 const router = Router();
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
@@ -37,8 +40,14 @@ async function verifyPassword(password, stored) {
 router.post('/signup', async (req, res) => {
   try {
     const { email, password, name } = req.body;
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return res.status(400).json({ error: 'Email and password are required' });
+    }
+    if (!EMAIL_RE.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      return res.status(400).json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
     }
 
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
@@ -69,7 +78,7 @@ router.post('/signup', async (req, res) => {
 router.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
@@ -108,8 +117,11 @@ const AUTH_CODE_TTL_MINUTES = 5;
 router.post('/desktop-code', async (req, res) => {
   try {
     const { email, password, name } = req.body;
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return res.status(400).json({ error: 'Email and password are required' });
+    }
+    if (!EMAIL_RE.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
     }
 
     let user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
@@ -118,10 +130,7 @@ router.post('/desktop-code', async (req, res) => {
       // User exists — verify password
       const valid = await verifyPassword(password, user.password_hash);
       if (!valid) {
-        // Password changed on website side? Re-hash and update.
-        const passwordHash = await hashPassword(password);
-        db.prepare('UPDATE users SET password_hash = ?, updated_at = datetime(\'now\') WHERE id = ?')
-          .run(passwordHash, user.id);
+        return res.status(401).json({ error: 'Invalid email or password' });
       }
     } else {
       // First time — create user in billing DB
@@ -169,7 +178,7 @@ router.post('/desktop-code', async (req, res) => {
 router.post('/desktop-exchange', async (req, res) => {
   try {
     const { code } = req.body;
-    if (!code) {
+    if (!code || typeof code !== 'string') {
       return res.status(400).json({ error: 'Code is required' });
     }
 

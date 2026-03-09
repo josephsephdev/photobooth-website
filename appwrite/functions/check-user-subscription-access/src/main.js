@@ -20,20 +20,14 @@ import { Client, Databases, Query } from 'node-appwrite';
 
 export default async function main({ req, res, log, error }) {
   try {
-    // Primary: use Appwrite-injected user ID (authenticated calls from website frontend)
-    let userId = req.headers['x-appwrite-user-id'];
-
-    // Fallback: accept userId from request body (unauthenticated calls from desktop app)
-    if (!userId) {
-      let body;
-      try {
-        body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      } catch { /* ignore parse errors */ }
-      userId = body?.userId;
-    }
+    // PHASE 4 SECURITY FIX: Require proper authentication, do not accept userId from request body
+    // This prevents privacy leak where any caller could check any user's subscription status
+    const userId = req.headers['x-appwrite-user-id'];
 
     if (!userId) {
-      return res.json({ hasAccess: false, error: 'User ID required' }, 401);
+      // Return 401 if not authenticated
+      // User must be authenticated via Appwrite session
+      return res.json({ hasAccess: false, error: 'Authentication required' }, 401);
     }
 
     const client = new Client()

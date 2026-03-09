@@ -10,13 +10,13 @@
  * Required environment variables:
  *   APPWRITE_ENDPOINT          — e.g. https://sgp.cloud.appwrite.io/v1
  *   APPWRITE_PROJECT_ID        — your Appwrite project ID
- *   APPWRITE_API_KEY           — server-side API key (Databases read scope)
+ *   APPWRITE_API_KEY           — server-side API key (Databases read + users.read scopes)
  *   APPWRITE_DATABASE_ID       — e.g. photobooth_db
  *   APPWRITE_COLLECTION_SUBSCRIPTIONS — e.g. subscriptions
  *   APPWRITE_COLLECTION_PROFILES      — e.g. profiles
  */
 
-import { Client, Databases, Query } from 'node-appwrite';
+import { Client, Databases, Query, Users } from 'node-appwrite';
 
 // ── Config ─────────────────────────────────────────────────────────
 
@@ -31,6 +31,16 @@ const COLLECTION_PROFILES      = process.env.APPWRITE_COLLECTION_PROFILES       
 // ── SDK Init ───────────────────────────────────────────────────────
 
 let databases = null;
+let usersClient = null;
+
+function getClient() {
+  if (!ENDPOINT || !PROJECT_ID || !API_KEY) return null;
+  const client = new Client()
+    .setEndpoint(ENDPOINT)
+    .setProject(PROJECT_ID)
+    .setKey(API_KEY);
+  return client;
+}
 
 function getDb() {
   if (databases) return databases;
@@ -49,6 +59,7 @@ function getDb() {
     .setKey(API_KEY);
 
   databases = new Databases(client);
+  usersClient = new Users(client);
   console.log('✅ Appwrite SDK initialised for server-side queries');
   return databases;
 }
@@ -56,24 +67,40 @@ function getDb() {
 // ── Queries ────────────────────────────────────────────────────────
 
 /**
- * Look up the Appwrite userId for a given email by querying the
- * `profiles` collection.  Returns the userId string, or null.
+ * Look up the Appwrite userId for a given email.
+ * 1. Tries the profiles collection first (fast, indexed).
+ * 2. Falls back to the Appwrite Users API (works even if no profile doc yet).
+ * Returns the userId string, or null.
  */
 export async function getAppwriteUserIdByEmail(email) {
   const db = getDb();
   if (!db) return null;
 
+  // 1. Try profiles collection
   try {
     const result = await db.listDocuments(DATABASE_ID, COLLECTION_PROFILES, [
       Query.equal('email', email),
       Query.limit(1),
     ]);
-    if (result.total === 0) return null;
-    return result.documents[0].userId ?? null;
+    if (result.total > 0) {
+      const userId = result.documents[0].userId;
+      if (userId) return userId;
+    }
   } catch (err) {
     console.error('Appwrite profile lookup error:', err.message);
-    return null;
   }
+
+  // 2. Fall back to Users API (handles accounts without a profile doc yet)
+  if (usersClient) {
+    try {
+      const result = await usersClient.list([Query.equal('email', email), Query.limit(1)]);
+      if (result.total > 0) return result.users[0].$id;
+    } catch (err) {
+      console.error('Appwrite Users API lookup error:', err.message);
+    }
+  }
+
+  return null;
 }
 
 /**

@@ -73,8 +73,7 @@ router.post('/webhook', (req, res) => {
     return res.json({ received: true });
   } catch (err) {
     console.error('Webhook processing error:', err);
-    // Return 200 to prevent Xendit from retrying on our bug
-    return res.status(200).json({ received: true, error: 'internal' });
+    return res.status(500).json({ error: 'internal' });
   }
 });
 

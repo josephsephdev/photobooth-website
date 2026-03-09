@@ -29,6 +29,9 @@ router.post('/create-checkout', requireAuth, async (req, res) => {
     const { planId } = req.body;
 
     // 1. Validate plan server-side
+    if (!planId || typeof planId !== 'string') {
+      return res.status(400).json({ error: 'Invalid plan selected' });
+    }
     const plan = getPlan(planId);
     if (!plan) {
       return res.status(400).json({ error: 'Invalid plan selected' });

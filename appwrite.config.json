@@ -133,7 +133,7 @@
             "path": "functions/check-user-subscription-access",
             "entrypoint": "src/main.js",
             "execute": [
-                "any"
+                "users"
             ],
             "enabled": true,
             "logging": true,
@@ -152,13 +152,11 @@
             "runtime": "node-22",
             "path": "functions/sync-xendit-payment-history",
             "entrypoint": "src/main.js",
-            "execute": [
-                "users"
-            ],
+            "execute": [],
             "enabled": true,
             "logging": true,
             "events": [],
-            "schedule": "",
+            "schedule": "0 0 * * *",
             "timeout": 15,
             "commands": "npm install",
             "scopes": [

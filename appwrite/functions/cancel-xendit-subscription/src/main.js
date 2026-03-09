@@ -28,7 +28,7 @@ export default async function main({ req, res, log, error }) {
       return res.json({ error: 'Authentication required' }, 401);
     }
 
-    if (!subscriptionDocId) {
+    if (!subscriptionDocId || typeof subscriptionDocId !== 'string') {
       return res.json({ error: 'subscriptionDocId is required' }, 400);
     }
 

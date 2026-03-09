@@ -65,7 +65,18 @@ export default async ({ req, res, log, error }) => {
     const paymentDoc = paymentsList.documents[0];
 
     // ── 5. Handle payment status ─────────────────────────────────
+    // PHASE 1 FIX: Make webhook idempotent by checking current status before update
+    
     if (status === 'PAID' || status === 'SETTLED') {
+      // IDEMPOTENT CHECK: If already marked paid, skip duplicate processing
+      if (paymentDoc.status === 'paid') {
+        log(`Payment ${paymentDoc.$id} already marked paid; skipping duplicate webhook`);
+        return res.json({ received: true });
+      }
+
+      // Log state transition
+      log(`Payment ${paymentDoc.$id}: transitioning from ${paymentDoc.status} to paid`);
+
       await databases.updateDocument(
         DATABASE_ID,
         COLLECTION_PAYMENTS,
@@ -78,9 +89,20 @@ export default async ({ req, res, log, error }) => {
       );
 
       log(`Payment ${paymentDoc.$id} marked as paid`);
+      
+      // Activate subscription only on successful payment
       await activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, paymentDoc, log);
 
     } else if (status === 'EXPIRED' || status === 'FAILED') {
+      // IDEMPOTENT CHECK: Skip if already in final state
+      if (['expired', 'failed', 'paid', 'cancelled'].includes(paymentDoc.status)) {
+        log(`Payment ${paymentDoc.$id} already in final state (${paymentDoc.status}); skipping`);
+        return res.json({ received: true });
+      }
+
+      // Log state transition
+      log(`Payment ${paymentDoc.$id}: transitioning from ${paymentDoc.status} to ${status.toLowerCase()}`);
+
       await databases.updateDocument(
         DATABASE_ID,
         COLLECTION_PAYMENTS,
@@ -88,12 +110,19 @@ export default async ({ req, res, log, error }) => {
         { status: status.toLowerCase() },
       );
       log(`Payment ${paymentDoc.$id} marked as ${status.toLowerCase()}`);
+    } else {
+      // Unknown status—log but do not update
+      log(`Payment ${paymentDoc.$id}: unknown status received: ${status}`);
     }
 
+    // PHASE 1 FIX: Return success only after all DB operations complete
     return res.json({ received: true });
+
   } catch (err) {
+    // PHASE 1 FIX: Return error (5xx) so Xendit retries
+    // Do NOT return 200 on failure
     error(`xendit-webhook-handler error: ${err.message}`);
-    return res.json({ received: true, error: 'internal' }, 200);
+    return res.json({ error: 'internal_error', details: err.message }, 500);
   }
 };
 

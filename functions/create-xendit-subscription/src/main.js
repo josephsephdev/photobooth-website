@@ -100,6 +100,9 @@ export default async ({ req, res, log, error }) => {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body ?? {});
     const { planId } = body;
 
+    if (!planId || typeof planId !== 'string') {
+      return res.json({ error: 'Invalid plan selected' }, 400);
+    }
     const plan = PLANS[planId];
     if (!plan) {
       return res.json({ error: 'Invalid plan selected' }, 400);
@@ -167,6 +170,27 @@ export default async ({ req, res, log, error }) => {
     // ── 4. Generate external ID ──────────────────────────────────
     const externalId = `pb_${planId}_${userId}_${Date.now()}`;
 
+    // ── 4.5 PHASE 8: Final duplicate check (prevent race condition) ──
+    // Between checking existing payments above and now, another request
+    // might have created a pending payment for the same user+plan.
+    // Re-check to prevent concurrent duplicates under load.
+    const finalPendingCheck = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_PAYMENTS,
+      [
+        Query.equal('userId', userId),
+        Query.equal('planId', planId),
+        Query.equal('status', 'pending'),
+        Query.limit(1),
+      ],
+    );
+
+    if (finalPendingCheck.documents.length > 0) {
+      const existingPending = finalPendingCheck.documents[0];
+      log(`PHASE 8: Race condition detected. Pending payment ${existingPending.$id} already exists for user ${userId} / plan ${planId}. Returning existing.`);
+      return res.json({ checkoutUrl: existingPending.checkoutUrl, reused: true, raceConditionHandled: true });
+    }
+
     // ── 5. Create Xendit Invoice ─────────────────────────────────
     const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -212,7 +236,8 @@ export default async ({ req, res, log, error }) => {
     log(`Xendit invoice created: ${invoice.id} for user ${userId}`);
 
     // ── 6. Store pending payment in Appwrite database ────────────
-    await databases.createDocument(
+    // PHASE 5: Add new audit trail fields
+    const newPayment = await databases.createDocument(
       DATABASE_ID,
       COLLECTION_PAYMENTS,
       ID.unique(),
@@ -228,7 +253,11 @@ export default async ({ req, res, log, error }) => {
         status: 'pending',
         method: '',
         paidAt: '',
+        cancelledAt: null,
+        supersededAt: null,
+        replacementTransactionId: null,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       [
         Permission.read(Role.user(userId)),

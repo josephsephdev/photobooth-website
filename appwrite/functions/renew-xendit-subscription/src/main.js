@@ -57,6 +57,9 @@ export default async function main({ req, res, log, error }) {
     const body = JSON.parse(req.body || '{}');
     const { planId } = body;
 
+    if (!planId || typeof planId !== 'string') {
+      return res.json({ error: 'Invalid plan selected' }, 400);
+    }
     const plan = PLANS[planId];
     if (!plan) {
       return res.json({ error: 'Invalid plan selected' }, 400);
@@ -99,7 +102,11 @@ export default async function main({ req, res, log, error }) {
       const isExpired = new Date() >= invoiceExpiry;
 
       if (isExpired) {
-        await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, { status: 'expired' });
+        // PHASE 5: Set expiresAt when marking expired
+        await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, {
+          status: 'expired',
+          supersededAt: new Date().toISOString(),
+        });
         log(`Marked stale pending payment ${pending.$id} as expired`);
         continue;
       }
@@ -109,14 +116,39 @@ export default async function main({ req, res, log, error }) {
         return res.json({ checkoutUrl: pending.checkoutUrl, reused: true });
       }
 
+      // PHASE 5: Mark as superseded with timestamp
       await expireXenditInvoice(pending.xenditInvoiceId, XENDIT_SECRET, log);
-      await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, { status: 'superseded' });
+      await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, {
+        status: 'superseded',
+        supersededAt: new Date().toISOString(),
+      });
       log(`Superseded pending payment ${pending.$id} (was ${pendingPlanId}, user now wants ${planId})`);
     }
 
     // ── Create Xendit Invoice ────────────────────────────────────
     const externalId = `pb_renew_${planId}_${userId}_${Date.now()}`;
     const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    // ── PHASE 8: Final duplicate check (prevent race condition) ──
+    // Between checking existing payments above and now, another request
+    // might have created a pending payment for the same user+plan.
+    // Re-check to prevent concurrent duplicates under load.
+    const finalPendingCheck = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_PAYMENTS,
+      [
+        Query.equal('userId', userId),
+        Query.equal('planId', planId),
+        Query.equal('status', 'pending'),
+        Query.limit(1),
+      ],
+    );
+
+    if (finalPendingCheck.documents.length > 0) {
+      const existingPending = finalPendingCheck.documents[0];
+      log(`PHASE 8: Race condition detected. Pending payment ${existingPending.$id} already exists for user ${userId} / plan ${planId}. Returning existing.`);
+      return res.json({ checkoutUrl: existingPending.checkoutUrl, reused: true, raceConditionHandled: true });
+    }
 
     const invoicePayload = {
       external_id: externalId,
@@ -155,7 +187,8 @@ export default async function main({ req, res, log, error }) {
     log(`Renewal invoice created: ${invoice.id} for user ${userId}`);
 
     // ── Store pending payment ────────────────────────────────────
-    await databases.createDocument(
+    // PHASE 5: Capture the new payment ID and add audit fields
+    const newPayment = await databases.createDocument(
       DATABASE_ID,
       COLLECTION_PAYMENTS,
       ID.unique(),
@@ -171,9 +204,36 @@ export default async function main({ req, res, log, error }) {
         status: 'pending',
         method: '',
         paidAt: '',
+        cancelledAt: null,
+        supersededAt: null,
+        replacementTransactionId: null,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     );
+
+    log(`New payment document created: ${newPayment.$id}`);
+
+    // PHASE 5: Link all newly-superseded payments to this new payment
+    for (const pending of pendingList.documents) {
+      const pendingPlanId = pending.planId || extractPlanId(pending.providerPaymentId);
+      const createdAt = new Date(pending.createdAt);
+      const invoiceExpiry = new Date(createdAt.getTime() + INVOICE_DURATION_SECONDS * 1000);
+      const isExpired = new Date() >= invoiceExpiry;
+
+      // Skip if already reused or if it's for the same plan
+      if ((pendingPlanId === planId && pending.checkoutUrl) || isExpired) {
+        continue;
+      }
+
+      // This was a superseded payment—link it to the new payment
+      if (pending.status === 'superseded') {
+        await databases.updateDocument(DATABASE_ID, COLLECTION_PAYMENTS, pending.$id, {
+          replacementTransactionId: newPayment.$id,
+        });
+        log(`Linked superseded payment ${pending.$id} to new payment ${newPayment.$id}`);
+      }
+    }
 
     return res.json({ checkoutUrl: invoice.invoice_url });
   } catch (err) {

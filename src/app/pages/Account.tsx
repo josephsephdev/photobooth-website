@@ -19,14 +19,19 @@ import {
   AlertCircle,
   Image,
   XCircle,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { PaymentCountdown } from '../components/PaymentCountdown';
 import { useAuth } from '../context/AuthContext';
 import {
   getUserPayments,
   type PaymentDocument,
+  isPaymentStale,
+  getPaymentExpirationTime,
+  getPaymentTimeRemaining,
 } from '../lib/database.service';
-import { checkSubscriptionAccess } from '../lib/subscription.service';
+import { checkSubscriptionAccess, cancelXenditPayment } from '../lib/subscription.service';
 import { useState, useEffect } from 'react';
 
 /* ------------------------------------------------------------------ */
@@ -80,15 +85,27 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 /* ------------------------------------------------------------------ */
 /*  Status badge                                                      */
 /* ------------------------------------------------------------------ */
+// PHASE 6: Enhanced status badge with more color variations
 function StatusBadge({ status }: { status: string }) {
-  const isPositive = ['active', 'paid'].includes(status.toLowerCase());
+  const statusLower = status.toLowerCase();
+  
+  let bgColor = 'bg-ev-warning/15';
+  let textColor = 'text-ev-warning';
+  
+  if (['paid', 'active'].includes(statusLower)) {
+    bgColor = 'bg-ev-success/15';
+    textColor = 'text-ev-success';
+  } else if (['cancelled', 'expired'].includes(statusLower)) {
+    bgColor = 'bg-ev-danger/15';
+    textColor = 'text-ev-danger';
+  } else if ('superseded' === statusLower) {
+    bgColor = 'bg-ev-warning/15';
+    textColor = 'text-ev-warning';
+  }
+  
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
-        isPositive
-          ? 'bg-ev-success/15 text-ev-success'
-          : 'bg-ev-warning/15 text-ev-warning'
-      }`}
+      className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${bgColor} ${textColor}`}
     >
       <CheckCircle2 className="w-3 h-3" />
       {status}
@@ -116,6 +133,10 @@ export default function Account() {
 
   const [payments, setPayments] = useState<PaymentDocument[]>([]);
   const [loading, setLoading] = useState(true);
+  // PHASE 6: Track payment cancellation states
+  const [cancellingPaymentId, setCancellingPaymentId] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [cancelSuccess, setCancelSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
@@ -125,9 +146,50 @@ export default function Account() {
     ]).finally(() => setLoading(false));
   }, [isAuthenticated, user]);
 
+  // Auto-refresh payments every 10 seconds to catch expirations and status changes
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    
+    const interval = setInterval(() => {
+      getUserPayments(user.id)
+        .then(setPayments)
+        .catch(() => {});
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user]);
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  // PHASE 6: Handle payment cancellation
+  const handleCancelPayment = async (paymentId: string) => {
+    setCancellingPaymentId(paymentId);
+    setCancelError(null);
+    setCancelSuccess(null);
+
+    try {
+      const result = await cancelXenditPayment(paymentId);
+      
+      // Refresh payments list
+      if (user) {
+        const updated = await getUserPayments(user.id);
+        setPayments(updated);
+      }
+
+      // Show success message briefly
+      setCancelSuccess(`Payment cancelled successfully`);
+      setTimeout(() => setCancelSuccess(null), 3000);
+    } catch (err: any) {
+      const message = err?.message || 'Failed to cancel payment';
+      setCancelError(message);
+      setTimeout(() => setCancelError(null), 5000);
+      console.error('Cancel payment error:', err);
+    } finally {
+      setCancellingPaymentId(null);
+    }
   };
 
   const isPaid = access?.accountType === 'paid';
@@ -353,30 +415,47 @@ export default function Account() {
           {/* ============ Payment History (full width) ============ */}
           <div className="md:col-span-2">
             <DashboardCard title="Payment History" icon={Receipt} delay={0.25}>
+              {cancelSuccess && (
+                <div className="mb-4 p-3 bg-ev-success/15 border border-ev-success/30 rounded-lg text-sm text-ev-success flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                  {cancelSuccess}
+                </div>
+              )}
+              {cancelError && (
+                <div className="mb-4 p-3 bg-ev-danger/15 border border-ev-danger/30 rounded-lg text-sm text-ev-danger flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {cancelError}
+                </div>
+              )}
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-5 h-5 animate-spin text-ev-text-muted" />
                 </div>
               ) : (
                 <>
-                  {/* Table header */}
+                  {/* Table header - PHASE 6: Added Actions column; Added Countdown column */}
                   {payments.length > 0 && (
-                    <div className="hidden sm:grid grid-cols-5 gap-4 text-xs font-medium text-ev-text-muted uppercase tracking-wider pb-3 border-b border-ev-border/40">
+                    <div className="hidden sm:grid grid-cols-7 gap-4 text-xs font-medium text-ev-text-muted uppercase tracking-wider pb-3 border-b border-ev-border/40">
                       <span>Reference</span>
                       <span>Date</span>
                       <span>Plan</span>
                       <span className="text-right">Amount</span>
                       <span className="text-right">Status</span>
+                      <span className="text-center">Expires In</span>
+                      <span className="text-center">Action</span>
                     </div>
                   )}
 
-                  {/* Rows */}
+                  {/* Rows - PHASE 6: Added cancel button; Added countdown timer */}
                   {payments.map((item) => {
                     const refId = item.providerPaymentId || item.$id;
+                    const canCancel = ['pending', 'superseded'].includes(item.status);
+                    const isCancelling = cancellingPaymentId === item.$id;
+                    
                     return (
                       <div
                         key={item.$id}
-                        className="grid grid-cols-1 sm:grid-cols-5 gap-2 sm:gap-4 py-3.5 border-b border-ev-border/20 last:border-0 text-sm"
+                        className="grid grid-cols-1 sm:grid-cols-7 gap-2 sm:gap-4 py-3.5 border-b border-ev-border/20 last:border-0 text-sm"
                       >
                         <span className="font-medium text-ev-text-primary text-xs sm:text-sm truncate" title={refId}>
                           {refId.length > 20 ? `…${refId.slice(-16)}` : refId}
@@ -385,26 +464,37 @@ export default function Account() {
                           <Clock className="w-3.5 h-3.5 sm:hidden" />
                           {formatDate(item.paidAt || item.createdAt)}
                         </span>
-                        <span className="text-ev-text-secondary text-xs sm:text-sm">{item.method || '—'}</span>
+                        <span className="text-ev-text-secondary text-xs sm:text-sm">{item.planId || '—'}</span>
                         <span className="font-medium text-ev-text-primary sm:text-right text-xs sm:text-sm">
                           {item.currency === 'PHP' ? '₱' : item.currency}{(item.amount / 100).toLocaleString()}
                         </span>
-                        <span className="sm:text-right flex items-center gap-2 justify-end">
+                        <span className="sm:text-right">
                           <StatusBadge status={item.status} />
-                          {(item.status === 'pending' || item.status === 'superseded') && (
-                            <Button
-                              variant="outline"
-                              size="xs"
-                              className="border-ev-border hover:border-ev-danger/50 bg-ev-surface/30 hover:bg-ev-danger/10 text-ev-text-primary hover:text-ev-danger transition-all"
-                              onClick={async () => {
-                                await cancelPayment(item.$id);
-                                // Refresh payment history
-                                if (user) setPayments(await getUserPayments(user.id));
-                              }}
+                        </span>
+                        <span className="sm:text-center">
+                          <PaymentCountdown payment={item} />
+                        </span>
+                        <span className="text-center">
+                          {canCancel ? (
+                            <button
+                              onClick={() => handleCancelPayment(item.$id)}
+                              disabled={isCancelling}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-ev-danger/15 text-ev-danger hover:bg-ev-danger/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
-                              <XCircle className="w-3 h-3 mr-1" />
-                              Cancel
-                            </Button>
+                              {isCancelling ? (
+                                <>
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                  Cancelling
+                                </>
+                              ) : (
+                                <>
+                                  <Trash2 className="w-3 h-3" />
+                                  Cancel
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            <span className="text-ev-text-muted text-xs">—</span>
                           )}
                         </span>
                       </div>
@@ -435,69 +525,16 @@ export default function Account() {
               </div>
               <Button
                 onClick={handleSignOut}
-                // ...existing code...
-
-                // Cancel payment function
-                async function cancelPayment(paymentId: string) {
-                  try {
-                    // Call Appwrite function endpoint
-                    const response = await fetch('https://cloud.appwrite.io/v1/functions/cancel-xendit-payment/execution', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'X-Appwrite-Project': import.meta.env.VITE_APPWRITE_PROJECT_ID,
-                        'X-Appwrite-Response-Format': 'json',
-                      },
-                      body: JSON.stringify({ paymentId }),
-                      credentials: 'include',
-                    });
-                    const result = await response.json();
-                    if (!response.ok || result.error) {
-                      alert(result.error || 'Failed to cancel payment.');
-                    }
-                  } catch (err) {
-                    alert('Error cancelling payment.');
-                  }
-                }
-
-                return (
-                  <div className="min-h-screen text-ev-text-primary flex flex-col">
-                    {/* Background effects */}
-                    <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#00d4aa]/6 rounded-full blur-3xl" />
-                      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#00bcd4]/6 rounded-full blur-3xl" />
-                    </div>
-
-                    {/* Header bar */}
-                    <div className="relative z-10 px-6 pt-8 pb-2 flex items-center justify-between">
-                      <Link to="/" className="inline-flex items-center gap-3 group">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-[rgba(0,212,170,0.3)] group-hover:shadow-[rgba(0,212,170,0.5)] transition-shadow">
-                          <Camera className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
-                      </Link>
-
-                      <Button
-                        onClick={handleSignOut}
-                        variant="ghost"
-                        className="text-ev-text-secondary hover:text-ev-danger hover:bg-ev-danger/10 transition-colors gap-2"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Sign Out
-                      </Button>
-                    </div>
-
-                    {/* Content */}
-                    <div className="relative z-10 flex-1 w-full max-w-5xl mx-auto px-6 py-10">
-                      {/* Page heading */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="mb-10"
-                      >
-                        <h1 className="text-3xl md:text-4xl font-bold text-ev-text-primary mb-2">Account Dashboard</h1>
-                        <p className="text-ev-text-secondary">
-                          Manage your account, subscription, and billing details.
-                        </p>
-                      </motion.div>
+                variant="outline"
+                className="border-ev-danger/40 hover:border-ev-danger bg-ev-surface/30 hover:bg-ev-danger/10 text-ev-danger font-medium gap-2 transition-all shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

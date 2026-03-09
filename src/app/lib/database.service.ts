@@ -58,7 +58,11 @@ export interface PaymentDocument extends Models.Document {
   status: string;
   method: string;
   paidAt: string;
+  cancelledAt?: string | null;
+  supersededAt?: string | null;
+  replacementTransactionId?: string | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 // ── Profile Queries ────────────────────────────────────────────────
@@ -173,6 +177,74 @@ export async function getUserPayments(
   } catch {
     return [];
   }
+}
+
+/**
+ * PHASE 5: Helper to identify stale pending/superseded payments.
+ * 
+ * A pending payment is considered stale if:
+ *   - status is 'pending' or 'superseded'
+ *   - created more than 30 minutes ago
+ * 
+ * This helps the UI show warnings or enable retry/cancel actions.
+ */
+export function isPaymentStale(payment: PaymentDocument): boolean {
+  const INVOICE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+  
+  if (!['pending', 'superseded'].includes(payment.status)) {
+    return false;
+  }
+  
+  const createdAt = new Date(payment.createdAt);
+  const now = new Date();
+  const ageMs = now.getTime() - createdAt.getTime();
+  
+  return ageMs > INVOICE_DURATION_MS;
+}
+
+/**
+ * Helper to get the expiration time for a payment.
+ * Returns null if payment is not pending/superseded or already expired.
+ */
+export function getPaymentExpirationTime(payment: PaymentDocument): Date | null {
+  const INVOICE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+  
+  if (!['pending', 'superseded'].includes(payment.status)) {
+    return null;
+  }
+  
+  const createdAt = new Date(payment.createdAt);
+  const expiresAt = new Date(createdAt.getTime() + INVOICE_DURATION_MS);
+  const now = new Date();
+  
+  if (expiresAt <= now) {
+    return null; // Already expired
+  }
+  
+  return expiresAt;
+}
+
+/**
+ * Get remaining time in seconds for a pending payment to expire.
+ * Returns 0 if already expired, or null if not a pending/superseded payment.
+ */
+export function getPaymentTimeRemaining(payment: PaymentDocument): number | null {
+  const INVOICE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+  
+  if (!['pending', 'superseded'].includes(payment.status)) {
+    return null;
+  }
+  
+  const createdAt = new Date(payment.createdAt);
+  const expiresAt = new Date(createdAt.getTime() + INVOICE_DURATION_MS);
+  const now = new Date();
+  const remainingMs = expiresAt.getTime() - now.getTime();
+  
+  if (remainingMs <= 0) {
+    return 0; // Already expired
+  }
+  
+  return Math.ceil(remainingMs / 1000); // Return seconds, rounded up
 }
 
 // ── Subscription Access Check ──────────────────────────────────────

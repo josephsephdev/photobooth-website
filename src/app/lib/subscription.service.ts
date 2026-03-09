@@ -20,6 +20,7 @@ const functions = new Functions(client);
 const FUNCTION_IDS = {
   CREATE_XENDIT_SUBSCRIPTION:  'create-xendit-subscription',
   CANCEL_XENDIT_SUBSCRIPTION:  'cancel-xendit-subscription',
+  CANCEL_XENDIT_PAYMENT:       'cancel-xendit-payment',
   RENEW_XENDIT_SUBSCRIPTION:   'renew-xendit-subscription',
   CHECK_SUBSCRIPTION_ACCESS:   'check-user-subscription-access',
 } as const;
@@ -94,6 +95,28 @@ export async function cancelXenditSubscription(subscriptionDocId: string): Promi
     const body = tryParseJson(execution.responseBody);
     throw new Error(body?.error || 'Failed to cancel subscription');
   }
+}
+
+/**
+ * PHASE 2: Cancel a pending payment via Appwrite Function.
+ * This will expire the invoice in Xendit and mark it cancelled locally.
+ */
+export async function cancelXenditPayment(paymentId: string): Promise<any> {
+  const execution = await functions.createExecution(
+    FUNCTION_IDS.CANCEL_XENDIT_PAYMENT,
+    JSON.stringify({ paymentId }),
+    false,
+    undefined,
+    ExecutionMethod.POST,
+  );
+
+  if (execution.responseStatusCode >= 400) {
+    const body = tryParseJson(execution.responseBody);
+    throw new Error(body?.error || 'Failed to cancel payment');
+  }
+
+  const data = tryParseJson(execution.responseBody);
+  return data;
 }
 
 // ── Renew / Reactivate ─────────────────────────────────────────────
