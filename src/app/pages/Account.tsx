@@ -20,6 +20,7 @@ import {
   Image,
   XCircle,
   Trash2,
+  Monitor,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { PaymentCountdown } from '../components/PaymentCountdown';
@@ -32,6 +33,7 @@ import {
   getPaymentTimeRemaining,
 } from '../lib/database.service';
 import { checkSubscriptionAccess, cancelXenditPayment } from '../lib/subscription.service';
+import { getUserDevices, removeDevice, type DeviceDocument } from '../lib/device.service';
 import { useState, useEffect } from 'react';
 
 /* ------------------------------------------------------------------ */
@@ -137,12 +139,15 @@ export default function Account() {
   const [cancellingPaymentId, setCancellingPaymentId] = useState<string | null>(null);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [cancelSuccess, setCancelSuccess] = useState<string | null>(null);
+  const [devices, setDevices] = useState<DeviceDocument[]>([]);
+  const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
     Promise.all([
       checkSubscriptionAccess().then(setAccess),
       getUserPayments(user.id).then(setPayments).catch(() => {}),
+      getUserDevices(user.id).then(setDevices).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, [isAuthenticated, user]);
 
@@ -193,6 +198,22 @@ export default function Account() {
   };
 
   const isPaid = access?.accountType === 'paid';
+
+  const handleRemoveDevice = async (deviceId: string) => {
+    setRemovingDeviceId(deviceId);
+    try {
+      await removeDevice(deviceId);
+      if (user) {
+        const updated = await getUserDevices(user.id);
+        setDevices(updated);
+      }
+    } catch (err: any) {
+      console.error('Remove device error:', err);
+    } finally {
+      setRemovingDeviceId(null);
+    }
+  };
+
   const formatDate = (iso: string | null) => {
     if (!iso) return '—';
     return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -411,6 +432,61 @@ export default function Account() {
               </Button>
             </div>
           </DashboardCard>
+
+          {/* ============ Registered Devices ============ */}
+          <div className="md:col-span-2">
+            <DashboardCard title="Registered Devices" icon={Monitor} delay={0.22}>
+              {loading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-5 h-5 animate-spin text-ev-text-muted" />
+                </div>
+              ) : devices.length === 0 ? (
+                <p className="text-center text-ev-text-muted py-6 text-sm">
+                  No devices registered yet. Devices are registered when you sign in on the desktop app.
+                </p>
+              ) : (
+                <div className="space-y-0">
+                  {devices.map((device) => (
+                    <div
+                      key={device.$id}
+                      className="flex items-center justify-between py-3 border-b border-ev-border/20 last:border-0"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-ev-surface-elevated/50 border border-ev-border/30 flex items-center justify-center flex-shrink-0">
+                          <Monitor className="w-4 h-4 text-ev-accent" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-ev-text-primary truncate">
+                            {device.deviceName}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-ev-text-muted">
+                            <span className="px-1.5 py-0.5 rounded bg-ev-surface-elevated/50 border border-ev-border/30 uppercase">
+                              {device.platform}
+                            </span>
+                            <span>
+                              Last active: {device.lastActive ? formatDate(device.lastActive) : '—'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveDevice(device.deviceId)}
+                        disabled={removingDeviceId === device.deviceId}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-ev-danger/15 text-ev-danger hover:bg-ev-danger/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0 ml-3"
+                      >
+                        {removingDeviceId === device.deviceId ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3 h-3" />
+                        )}
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DashboardCard>
+          </div>
 
           {/* ============ Payment History (full width) ============ */}
           <div className="md:col-span-2">

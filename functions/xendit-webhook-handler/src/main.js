@@ -174,8 +174,13 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
 
   const userId = paymentDoc.userId;
   const now = new Date();
+
+  // Use durationDays from payment doc (set by create-xendit-subscription) with plan fallback
+  const durationDays = paymentDoc.durationDays || plan.durationDays;
+  const deviceLimit = paymentDoc.deviceLimit || 2;
+
   const expiresAt = new Date(now);
-  expiresAt.setDate(expiresAt.getDate() + plan.durationDays);
+  expiresAt.setDate(expiresAt.getDate() + durationDays);
 
   const existingSubs = await databases.listDocuments(
     DATABASE_ID,
@@ -197,7 +202,7 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
     const existing = existingSubs.documents[0];
     const currentEnd = new Date(existing.expiresAt);
     const newEnd = new Date(currentEnd);
-    newEnd.setDate(newEnd.getDate() + plan.durationDays);
+    newEnd.setDate(newEnd.getDate() + durationDays);
 
     await databases.updateDocument(
       DATABASE_ID,
@@ -208,6 +213,7 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
         planName: plan.name,
         expiresAt: newEnd.toISOString(),
         nextBillingDate: newEnd.toISOString(),
+        deviceLimit: deviceLimit,
         updatedAt: now.toISOString(),
       },
       docPermissions,
@@ -229,6 +235,7 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
         startDate: now.toISOString(),
         nextBillingDate: expiresAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
+        deviceLimit: deviceLimit,
         canceledAt: null,
         updatedAt: now.toISOString(),
       },

@@ -225,6 +225,25 @@
                 "documents.write"
             ],
             "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "manage-device",
+            "name": "manage-device",
+            "runtime": "node-22",
+            "path": "functions/manage-device",
+            "entrypoint": "src/main.js",
+            "execute": ["users"],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "commands": "npm install",
+            "scopes": [
+                "documents.read",
+                "documents.write"
+            ],
+            "specification": "s-0.5vcpu-512mb"
         }
     ],
     "tablesDB": [

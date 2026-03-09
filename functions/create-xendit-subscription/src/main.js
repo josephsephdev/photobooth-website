@@ -99,6 +99,8 @@ export default async ({ req, res, log, error }) => {
     // ── 1. Parse input ───────────────────────────────────────────
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body ?? {});
     const { planId } = body;
+    const durationUnits = Math.max(1, Math.floor(Number(body.durationUnits) || 1));
+    const deviceLimit = Math.max(2, Math.min(10, Math.floor(Number(body.deviceLimit) || 2)));
 
     if (!planId || typeof planId !== 'string') {
       return res.json({ error: 'Invalid plan selected' }, 400);
@@ -107,6 +109,13 @@ export default async ({ req, res, log, error }) => {
     if (!plan) {
       return res.json({ error: 'Invalid plan selected' }, 400);
     }
+
+    // ── Dynamic pricing ──────────────────────────────────────────
+    const periodPrice = plan.price * durationUnits;
+    const extraDevices = Math.max(0, deviceLimit - 2);
+    const deviceAddOn = Math.round(periodPrice * extraDevices * 0.20);
+    const totalPrice = periodPrice + deviceAddOn;
+    const totalDurationDays = plan.durationDays * durationUnits;
 
     // ── 2. Get the calling user ──────────────────────────────────
     const client = new Client()
@@ -194,11 +203,19 @@ export default async ({ req, res, log, error }) => {
     // ── 5. Create Xendit Invoice ─────────────────────────────────
     const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+    // Build description with duration and device info
+    const durationLabel = planId === 'event_pass'
+      ? `${durationUnits} day${durationUnits > 1 ? 's' : ''}`
+      : planId === 'monthly'
+        ? `${durationUnits} month${durationUnits > 1 ? 's' : ''}`
+        : `${durationUnits} year${durationUnits > 1 ? 's' : ''}`;
+    const deviceLabel = deviceLimit > 2 ? ` | ${deviceLimit} devices` : '';
+
     const invoicePayload = {
       external_id: externalId,
-      amount: plan.price / 100, // Xendit expects major currency units
+      amount: totalPrice / 100, // Xendit expects major currency units
       currency: plan.currency,
-      description: `${plan.name} — Luis&Co. Photobooth App`,
+      description: `${plan.name} × ${durationLabel}${deviceLabel} — Luis&Co. Photobooth App`,
       payer_email: user.email,
       customer: {
         given_names: user.name || user.email.split('@')[0],
@@ -209,9 +226,9 @@ export default async ({ req, res, log, error }) => {
       failure_redirect_url: `${FRONTEND_URL}/#/checkout/cancel`,
       items: [
         {
-          name: plan.name,
+          name: `${plan.name} × ${durationLabel}${deviceLabel}`,
           quantity: 1,
-          price: plan.price / 100,
+          price: totalPrice / 100,
           category: 'subscription',
         },
       ],
@@ -248,7 +265,7 @@ export default async ({ req, res, log, error }) => {
         providerPaymentId: externalId,
         xenditInvoiceId: invoice.id,
         checkoutUrl: invoice.invoice_url,
-        amount: plan.price,
+        amount: totalPrice,
         currency: plan.currency,
         status: 'pending',
         method: '',
@@ -256,6 +273,9 @@ export default async ({ req, res, log, error }) => {
         cancelledAt: null,
         supersededAt: null,
         replacementTransactionId: null,
+        durationUnits: durationUnits,
+        durationDays: totalDurationDays,
+        deviceLimit: deviceLimit,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },

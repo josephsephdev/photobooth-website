@@ -47,12 +47,16 @@ interface SubscriptionAccessResponse {
  * Call the Appwrite Function that creates a Xendit checkout / invoice.
  * Returns the hosted checkout URL to redirect the user to.
  */
-export async function createXenditCheckout(planId: string): Promise<CheckoutResponse> {
-  console.log('[Checkout] Calling create-xendit-subscription with planId:', planId);
+export async function createXenditCheckout(
+  planId: string,
+  durationUnits: number = 1,
+  deviceLimit: number = 2,
+): Promise<CheckoutResponse> {
+  console.log('[Checkout] Calling create-xendit-subscription with:', { planId, durationUnits, deviceLimit });
   
   const execution = await functions.createExecution(
     FUNCTION_IDS.CREATE_XENDIT_SUBSCRIPTION,
-    JSON.stringify({ planId }),
+    JSON.stringify({ planId, durationUnits, deviceLimit }),
     false,        // async = false → wait for result
     undefined,    // path
     ExecutionMethod.POST,

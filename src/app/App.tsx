@@ -21,6 +21,7 @@ import About from './pages/About';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import RefundPolicy from './pages/RefundPolicy';
+import BillingConfig from './pages/BillingConfig';
 
 function LandingPage() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/billing/configure" element={<BillingConfig />} />
       <Route path="/account" element={<Account />} />
       <Route path="/checkout/success" element={<CheckoutSuccess />} />
       <Route path="/checkout/cancel" element={<CheckoutCancel />} />

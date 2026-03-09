@@ -17,6 +17,7 @@ export const COLLECTION = {
   SUBSCRIPTIONS: import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS || 'subscriptions',
   PAYMENTS:      import.meta.env.VITE_APPWRITE_COLLECTION_PAYMENTS      || 'payments',
   DESKTOP_AUTH_CODES: import.meta.env.VITE_APPWRITE_COLLECTION_DESKTOP_AUTH_CODES || 'desktop_auth_codes',
+  DEVICES:       import.meta.env.VITE_APPWRITE_COLLECTION_DEVICES       || 'devices',
 } as const;
 
 // ── Profile Fields ─────────────────────────────────────────────────
@@ -42,6 +43,7 @@ export const SUBSCRIPTION_FIELDS = {
   EXPIRES_AT:               'expiresAt',
   CANCELED_AT:              'canceledAt',
   UPDATED_AT:               'updatedAt',
+  DEVICE_LIMIT:             'deviceLimit',
 } as const;
 
 // ── Payment Fields ─────────────────────────────────────────────────
@@ -58,6 +60,9 @@ export const PAYMENT_FIELDS = {
   METHOD:              'method',
   PAID_AT:             'paidAt',
   CREATED_AT:          'createdAt',
+  DURATION_UNITS:      'durationUnits',
+  DURATION_DAYS:       'durationDays',
+  DEVICE_LIMIT:        'deviceLimit',
 } as const;
 
 // ── Subscription Statuses ──────────────────────────────────────────
@@ -84,4 +89,14 @@ export const PAYMENT_STATUS = {
 export const USER_ROLES = {
   USER:  'user',
   ADMIN: 'admin',
+} as const;
+
+// ── Device Fields ────────────────────────────────────────────────────────
+export const DEVICE_FIELDS = {
+  USER_ID:     'userId',
+  DEVICE_ID:   'deviceId',
+  DEVICE_NAME: 'deviceName',
+  PLATFORM:    'platform',
+  LAST_ACTIVE: 'lastActive',
+  CREATED_AT:  'createdAt',
 } as const;

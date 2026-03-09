@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, Check, Sparkles, Zap, Crown, Loader2 } from 'lucide-react';
+import { Camera, Check, Sparkles, Zap, Crown } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
-import { createXenditCheckout } from '../lib/subscription.service';
 
 const plans = [
   {
@@ -76,30 +75,20 @@ const plans = [
 
 export default function Pricing() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState('');
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  /** Handle plan selection → call Appwrite Function → redirect to Xendit */
-  const handleSelectPlan = async (planId: string) => {
+  /** Handle plan selection → navigate to billing config page */
+  const handleSelectPlan = (planId: string) => {
     setError('');
 
-    // If not signed in, redirect to sign-in first
     if (!isAuthenticated) {
       navigate('/signin');
       return;
     }
 
-    setLoadingPlan(planId);
-    try {
-      const { checkoutUrl } = await createXenditCheckout(planId);
-      // Redirect to Xendit hosted checkout
-      window.location.href = checkoutUrl;
-    } catch (err: any) {
-      setError(err.message || 'Could not start checkout. Please try again.');
-      setLoadingPlan(null);
-    }
+    navigate(`/billing/configure?plan=${planId}`);
   };
 
   return (
@@ -241,27 +230,17 @@ export default function Pricing() {
                       {plan.popular ? (
                         <Button
                           onClick={() => handleSelectPlan(plan.id)}
-                          disabled={loadingPlan === plan.id}
-                          className="w-full h-12 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] hover:shadow-[rgba(0,212,170,0.4)] transition-all duration-300 text-sm disabled:opacity-60"
+                          className="w-full h-12 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] hover:shadow-[rgba(0,212,170,0.4)] transition-all duration-300 text-sm"
                         >
-                          {loadingPlan === plan.id ? (
-                            <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing…</span>
-                          ) : (
-                            'Get Started'
-                          )}
+                          Get Started
                         </Button>
                       ) : (
                         <Button
                           onClick={() => handleSelectPlan(plan.id)}
-                          disabled={loadingPlan === plan.id}
                           variant="outline"
-                          className="w-full h-12 border-ev-border hover:border-ev-accent/50 bg-ev-surface-elevated/40 hover:bg-ev-accent/10 text-ev-text-primary font-semibold transition-all duration-300 text-sm disabled:opacity-60"
+                          className="w-full h-12 border-ev-border hover:border-ev-accent/50 bg-ev-surface-elevated/40 hover:bg-ev-accent/10 text-ev-text-primary font-semibold transition-all duration-300 text-sm"
                         >
-                          {loadingPlan === plan.id ? (
-                            <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing…</span>
-                          ) : (
-                            'Get Started'
-                          )}
+                          Get Started
                         </Button>
                       )}
                     </div>
