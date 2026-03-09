@@ -11,6 +11,7 @@ import { promisify } from 'node:util';
 import { nanoid } from 'nanoid';
 import db from '../db/index.js';
 import { signToken, requireAuth } from '../middleware/auth.js';
+import { getUserByAppwriteId } from '../config/appwrite.js';
 
 const scrypt = promisify(crypto.scrypt);
 const router = Router();
@@ -221,6 +222,83 @@ router.post('/desktop-exchange', async (req, res) => {
     return res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
   } catch (err) {
     console.error('desktop-exchange error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/*  POST /api/auth/appwrite-exchange                                  */
+/*                                                                    */
+/*  Called by the desktop app after the Appwrite code-exchange flow.  */
+/*  Accepts the Appwrite userId + token secret returned by the        */
+/*  desktop-auth-handoff function, verifies the token against the     */
+/*  Appwrite REST API, then issues a long-lived website JWT.          */
+/*                                                                    */
+/*  This is the bridge that lets the desktop app call the website's   */
+/*  /api/account/subscription endpoint (which requires a website JWT).*/
+/*                                                                    */
+/*  Request:  { userId: string, secret: string }                      */
+/*  Response: { token: string, user: { id, email, name } }            */
+/* ------------------------------------------------------------------ */
+router.post('/appwrite-exchange', async (req, res) => {
+  try {
+    const { userId, secret } = req.body;
+    if (!userId || !secret || typeof userId !== 'string' || typeof secret !== 'string') {
+      return res.status(400).json({ error: 'userId and secret are required' });
+    }
+
+    const endpoint = process.env.APPWRITE_ENDPOINT || process.env.VITE_APPWRITE_ENDPOINT || '';
+    const projectId = process.env.APPWRITE_PROJECT_ID || process.env.VITE_APPWRITE_PROJECT_ID || '';
+
+    if (!endpoint || !projectId) {
+      return res.status(503).json({ error: 'Appwrite not configured on this server' });
+    }
+
+    // Verify the Appwrite token by exchanging it for a session.
+    // POST /account/sessions/token is the magic-URL / token-session endpoint.
+    // It does NOT require an API key — the secret IS the proof of identity.
+    const sessionRes = await fetch(`${endpoint}/account/sessions/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Appwrite-Project': projectId,
+      },
+      body: JSON.stringify({ userId, secret }),
+    });
+
+    if (!sessionRes.ok) {
+      return res.status(401).json({ error: 'Invalid or expired Appwrite token' });
+    }
+
+    // Use the admin SDK to get the verified email (trusted source over the request body)
+    const appwriteUser = await getUserByAppwriteId(userId);
+    if (!appwriteUser) {
+      return res.status(404).json({ error: 'Appwrite user not found' });
+    }
+    if (!appwriteUser.emailVerification) {
+      return res.status(403).json({ error: 'Email address is not verified' });
+    }
+
+    const email = appwriteUser.email;
+    const displayName = appwriteUser.name ||
+      email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    // Find or create the user in the SQLite billing DB
+    let user = db.prepare('SELECT id, email, name FROM users WHERE email = ?').get(email);
+    if (!user) {
+      // Desktop-auth users don't have a local password — set a random one
+      const randomPw = crypto.randomBytes(32).toString('hex');
+      const passwordHash = await hashPassword(randomPw);
+      const result = db.prepare(
+        'INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)',
+      ).run(email, passwordHash, displayName);
+      user = { id: result.lastInsertRowid, email, name: displayName };
+    }
+
+    const token = signToken(user);
+    return res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+  } catch (err) {
+    console.error('appwrite-exchange error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

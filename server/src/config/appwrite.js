@@ -183,6 +183,22 @@ export async function getSubscriptionByEmail(email) {
 }
 
 /**
+ * Get a single Appwrite user by their Appwrite user ID.
+ * Returns the Appwrite User object (email, name, emailVerification, etc.), or null.
+ */
+export async function getUserByAppwriteId(appwriteUserId) {
+  getDb(); // ensures usersClient is initialised
+  if (!usersClient) return null;
+  try {
+    const user = await usersClient.get(appwriteUserId);
+    return user;
+  } catch (err) {
+    console.error('Appwrite getUserByAppwriteId error:', err.message);
+    return null;
+  }
+}
+
+/**
  * Check if Appwrite is configured and usable.
  */
 export function isAppwriteConfigured() {
