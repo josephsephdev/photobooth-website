@@ -5,7 +5,6 @@ import { selectTemplate } from './session.js';
 export async function loadTemplates() {
   try {
     const result = await api('api/templates.json');
-    console.log('Templates loaded:', result.templates?.map(t => ({ name: t.name, hasBackground: !!t.background })));
 
     if (result.success && result.templates.length > 0) {
       els.templateGrid.innerHTML = '';

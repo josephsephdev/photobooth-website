@@ -26,7 +26,6 @@ export function initWatermark() {
  * Always applies watermark (web app = free/try mode).
  */
 export async function applyWatermarkIfNeeded(dataUrl) {
-  console.log('🔖 [WM-CLIENT] applyWatermarkIfNeeded: always on (web app)')
   return await overlayTextWatermark(dataUrl)
 }
 
@@ -88,8 +87,6 @@ async function overlayTextWatermark(dataUrl) {
   ctx.fillText(text, x, y)
 
   ctx.globalAlpha = 1.0
-
-  console.log(`🔖 [WM-CLIENT] Watermark applied: bottom-right, fontSize=${fontSize}`)
 
   if (dataUrl.startsWith('data:image/png')) {
     return canvas.toDataURL('image/png')

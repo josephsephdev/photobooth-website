@@ -95,7 +95,6 @@ export async function startDslrLivePreview() {
 
   // Don't re-open if already streaming
   if (state._evfActive && state._evfWebSocket && state._evfWebSocket.readyState === WebSocket.OPEN) {
-    console.log('ℹ️  EVF already active');
     return;
   }
 
@@ -124,7 +123,6 @@ export async function startDslrLivePreview() {
   let frameCount = 0;
 
   ws.onopen = () => {
-    console.log('🔌 EVF WebSocket connected — requesting stream');
     ws.send('start-evf');
     state._evfActive = true;
   };
@@ -149,7 +147,6 @@ export async function startDslrLivePreview() {
             configurable: true, get: () => img.height,
           });
         }
-        console.log(`📷 EVF resolution: ${img.width}×${img.height}`);
       }
       if (ctx) ctx.drawImage(img, 0, 0);
       URL.revokeObjectURL(url);
@@ -160,7 +157,6 @@ export async function startDslrLivePreview() {
   };
 
   ws.onclose = () => {
-    console.log('🔌 EVF WebSocket closed');
     state._evfActive = false;
     state._evfWebSocket = null;
   };
@@ -171,7 +167,6 @@ export async function startDslrLivePreview() {
   };
 
   state._evfWebSocket = ws;
-  console.log('📷 DSLR live preview starting via WebSocket');
 }
 
 /**
@@ -195,7 +190,6 @@ export function freezeDslrPreview() {
   }
   state._evfActive = false;
   // Canvas stays visible with the last frame — intentionally NOT hidden
-  console.log('🧊 DSLR preview frozen (last frame visible)');
 }
 
 /**
@@ -214,22 +208,18 @@ export async function startWebcamIfNeeded() {
     els.video.style.display = 'none';
     showDslrPlaceholder();
     els.progressText.innerHTML = `Ready to start<br><small style="color: #28a745;">✓ ${state.cameraDisplayName || 'DSLR'} Connected</small>`;
-    console.log('✅ DSLR mode ready - initializing live preview');
-    
     // Start live preview via WebSocket EVF streaming
     await startDslrLivePreview();
     return;
   }
 
   if (state.cameraType === 'webcam') {
-    console.log('📹 Webcam Mode: Requesting camera access...');
     try {
       state.stream = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 1280 }, height: { ideal: 720 } }
       });
       els.video.srcObject = state.stream;
       els.video.style.display = 'block';
-      console.log('✅ Webcam active');
     } catch (error) {
       alert('Error accessing webcam: ' + error.message + '\n\nPlease allow camera access.');
     }

@@ -49,7 +49,6 @@ export async function captureNextPhoto() {
   let photoData = null;
 
   if (state.cameraType === 'dslr') {
-    console.log('📷 Attempting DSLR capture...');
     // Freeze the last EVF frame on canvas — stops the WebSocket stream
     // but keeps the last frame visible so the user sees the capture moment.
     // EDSDK cannot do EVF + TakePicture simultaneously.
@@ -66,13 +65,10 @@ export async function captureNextPhoto() {
     // Resume live preview after successful capture
     await startDslrLivePreview();
   } else if (state.cameraType === 'webcam') {
-    console.log('📹 Capturing with webcam...');
-    
     // Retry webcam capture in case video isn't ready
     for (let retries = 0; retries < 3; retries++) {
       photoData = captureWebcamPhoto();
       if (photoData) break;
-      console.log(`⏳ Retry ${retries + 1}/3 waiting for webcam...`);
       await sleep(150);
     }
     
@@ -89,7 +85,6 @@ export async function captureNextPhoto() {
       if (state.currentPhotoIndex < primaryBoxes2.length) {
         const currentBox = primaryBoxes2[state.currentPhotoIndex];
         photoData = await applyCropToPhoto(photoData, currentBox.width, currentBox.height);
-        console.log(`✂️  Applied crop: ${currentBox.width}x${currentBox.height}`);
       }
     }
   } else {

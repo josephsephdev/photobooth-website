@@ -6,8 +6,6 @@ import { state } from './state.js';
  * (DSLR capture removed — web app is webcam-only)
  */
 export function captureWebcamPhoto() {
-  console.log('📹 Capturing webcam photo...');
-
   if (!els.video) {
     console.error('❌ Webcam not ready - video element missing');
     return null;
@@ -33,7 +31,6 @@ export function captureWebcamPhoto() {
     els.ctx.restore();
 
     const photoData = els.canvas.toDataURL('image/jpeg', 0.85);
-    console.log('✅ Webcam photo captured');
     return photoData;
   } catch (error) {
     console.error('❌ Webcam capture error:', error.message);

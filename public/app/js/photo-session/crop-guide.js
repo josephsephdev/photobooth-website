@@ -150,7 +150,6 @@ export function showCropGuide(videoWidth, videoHeight) {
   
   // Show the overlay
   overlay.style.display = 'block';
-  console.log(`✅ Crop guide shown - Photo ${currentBoxIndex + 1}/${primaryBoxes.length} (${currentBox.width}x${currentBox.height}) at ${Math.round(relativeX)}, ${Math.round(relativeY)}, ${Math.round(cropDisplayWidth)}x${Math.round(cropDisplayHeight)}`);
 }
 
 export function hideCropGuide() {

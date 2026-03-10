@@ -49,7 +49,6 @@ export async function selectTemplate(templateSummary) {
 
   // ⭐ Load DPI from template (for preserving in output)
   state.backgroundImageDPI = templateSummary.backgroundImageDPI || 96;
-  console.log(`📐 Template DPI: ${state.backgroundImageDPI}`);
 
   // Reset auto print flag for new session
   state.autoPrinted = false;
