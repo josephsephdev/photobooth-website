@@ -44,21 +44,12 @@ export function initSessionControls() {
 }
 
 export async function selectTemplate(templateSummary) {
-  try {
-    const result = await api(`/api/templates/${templateSummary.id}`);
-    if (!result.success) {
-      alert('Error loading template: ' + result.error);
-      return;
-    }
-    state.selectedTemplate = result.template;
-    
-    // ⭐ Load DPI from template (for preserving in output)
-    state.backgroundImageDPI = result.template.backgroundImageDPI || 96;
-    console.log(`📐 Template DPI: ${state.backgroundImageDPI}`);
-  } catch (error) {
-    alert('Error loading template: ' + error.message);
-    return;
-  }
+  // Use the template data already loaded from the list endpoint
+  state.selectedTemplate = templateSummary;
+
+  // ⭐ Load DPI from template (for preserving in output)
+  state.backgroundImageDPI = templateSummary.backgroundImageDPI || 96;
+  console.log(`📐 Template DPI: ${state.backgroundImageDPI}`);
 
   // Reset auto print flag for new session
   state.autoPrinted = false;
