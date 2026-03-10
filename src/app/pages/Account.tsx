@@ -151,17 +151,15 @@ export default function Account() {
     ]).finally(() => setLoading(false));
   }, [isAuthenticated, user]);
 
-  // Auto-refresh payments every 10 seconds to catch expirations and status changes
+  // Refresh payments when user returns to the tab (webhook updates status server-side)
   useEffect(() => {
     if (!isAuthenticated || !user) return;
-    
-    const interval = setInterval(() => {
-      getUserPayments(user.id)
-        .then(setPayments)
-        .catch(() => {});
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(interval);
+    const onFocus = () => {
+      getUserPayments(user.id).then(setPayments).catch(() => {});
+      getUserDevices(user.id).then(setDevices).catch(() => {});
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, [isAuthenticated, user]);
 
   const handleSignOut = async () => {

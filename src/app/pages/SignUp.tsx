@@ -7,7 +7,6 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { createDesktopAuthCode } from '../lib/desktop-auth.service';
-import { isValidDesktopRedirect } from '../lib/redirect-validator';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,10 +21,10 @@ export default function SignUp() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Desktop app redirect params — validate redirect to prevent open redirect attacks
+  // Desktop app redirect params
   const source = searchParams.get('source');
   const redirect = searchParams.get('redirect');
-  const isDesktop = source === 'desktop' && !!redirect && isValidDesktopRedirect(redirect);
+  const isDesktop = source === 'desktop' && !!redirect;
 
   // Preserve desktop params for cross-page links
   const desktopParams = isDesktop

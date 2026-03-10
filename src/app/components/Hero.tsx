@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Download, ShieldCheck } from 'lucide-react';
+import { Camera, Download, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
 
@@ -76,6 +76,17 @@ export function Hero() {
             className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
           >
             <Link to="/pricing">View Subscription Plans</Link>
+          </Button>
+
+          <Button
+            asChild
+            size="lg"
+            className="text-lg px-8 py-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all duration-300"
+          >
+            <a href="/app/" target="_blank" rel="noopener noreferrer">
+              <Camera className="mr-2 h-5 w-5" />
+              Try App
+            </a>
           </Button>
         </motion.div>
 

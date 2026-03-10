@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photobooth — Try It</title>
+  <link rel="stylesheet" href="css/photo-session.css">
+</head>
+<body>
+
+  <!-- ═══ Home Screen ═══ -->
+  <div class="home-screen" id="homeScreen">
+    <div class="home-content">
+
+      <!-- ── Unlock label ── -->
+      <div class="promo-top-label">
+        <span class="promo-divider-line"></span>
+        <span class="promo-divider-label">Unlock More with the Desktop App</span>
+        <span class="promo-divider-line"></span>
+      </div>
+
+      <!-- ── 3-column layout: features | hero | features ── -->
+      <div class="home-layout">
+
+        <!-- Left features -->
+        <div class="features-column features-column-left">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg>
+            </div>
+            <div class="feature-text">
+              <span class="feature-name">Template Designer</span>
+              <span class="feature-desc">Create custom layouts with drag-and-drop ease</span>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="feature-text">
+              <span class="feature-name">DSLR Integration</span>
+              <span class="feature-desc">Connect professional cameras for stunning quality</span>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            </div>
+            <div class="feature-text">
+              <span class="feature-name">Auto Print</span>
+              <span class="feature-desc">Instant prints right after every session</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: Hero + Download -->
+        <div class="home-center">
+          <div class="hero-card">
+            <div class="hero-icon-wrapper">
+              <div class="hero-icon">
+                <svg class="icon-large" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div class="hero-glow"></div>
+            </div>
+            <div class="hero-content">
+              <h2 class="hero-title">Start Photo Session</h2>
+              <p class="hero-description">Try our photobooth — choose a template, strike a pose, and download your photo strip!</p>
+              <button class="btn btn-primary btn-hero" id="startSessionBtn">
+                <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Start Session
+              </button>
+            </div>
+          </div>
+
+          <!-- Download CTA -->
+          <div class="promo-cta">
+            <a href="#" class="btn btn-download" id="downloadAppBtn">
+              <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Download the App
+            </a>
+            <p class="promo-cta-note">Available for Windows</p>
+          </div>
+        </div>
+
+        <!-- Right features -->
+        <div class="features-column features-column-right">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="feature-text">
+              <span class="feature-name">Event Creation</span>
+              <span class="feature-desc">Organize and manage events effortlessly</span>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+            </div>
+            <div class="feature-text">
+              <span class="feature-name">Google Drive Storage</span>
+              <span class="feature-desc">Auto-backup every photo to the cloud</span>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0a4 4 0 00-8 0H3m2-9l1 1m8-1l-1 1M5.2 19h13.6"/><rect x="7" y="7" width="10" height="10" rx="1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 10h4v4h-4z"/></svg>
+            </div>
+            <div class="feature-text">
+              <span class="feature-name">QR Code Sharing</span>
+              <span class="feature-desc">Guests scan &amp; save photos to their phones</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.home-layout -->
+
+    </div>
+  </div>
+
+  <!-- ── Header (shown after home) ── -->
+  <header class="page-header" id="pageHeader" style="display:none;">
+    <div class="header-icon">
+      <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#fff" stroke-width="2"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>Photobooth</h1>
+      <span class="header-sub">Select a template &amp; start capturing</span>
+    </div>
+  </header>
+
+  <!-- ═══ Template Selection Screen ═══ -->
+  <div class="template-select-screen" id="templateSelectScreen" style="display:none;">
+    <button class="back-btn template-back-btn" id="templateBackBtn" title="Back to home">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="template-grid" id="templateGrid"></div>
+  </div>
+
+  <!-- ═══ Photo Session Screen ═══ -->
+  <div class="session-screen" id="sessionScreen">
+    <div class="camera-container">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+
+      <!-- Crop Guide Overlay -->
+      <div class="crop-guide-overlay" id="cropGuideOverlay">
+        <div class="crop-guide-corner crop-guide-tl"></div>
+        <div class="crop-guide-corner crop-guide-tr"></div>
+        <div class="crop-guide-corner crop-guide-bl"></div>
+        <div class="crop-guide-corner crop-guide-br"></div>
+        <div class="crop-guide-keep-area"></div>
+      </div>
+
+      <!-- Countdown -->
+      <div class="countdown-overlay" id="countdown"></div>
+
+      <!-- Progress -->
+      <div class="progress-bar">
+        <div class="progress-text" id="progressText">Ready to start</div>
+        <div class="progress-dots" id="progressDots"></div>
+      </div>
+
+      <!-- Camera Mode Indicator -->
+      <div id="cameraModeIndicator" class="camera-mode-indicator"></div>
+
+      <!-- Photo previews -->
+      <div class="preview-grid" id="previewGrid"></div>
+
+      <!-- Control panel -->
+      <div class="control-panel">
+        <!-- Timer Selector -->
+        <div class="timer-selector" id="timerSelector">
+          <button class="timer-btn" id="timerMinus">−</button>
+          <div class="timer-display">
+            <div class="timer-value" id="timerValue">3</div>
+            <div class="timer-label">sec</div>
+          </div>
+          <button class="timer-btn" id="timerPlus">+</button>
+        </div>
+
+        <button class="btn btn-start" id="startBtn">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+          Start Session
+        </button>
+        <button class="btn btn-retake" id="retakeBtn" style="display:none;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 15A9 9 0 115.64 5.64L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Retake Last Photo
+        </button>
+        <button class="btn btn-cancel" id="cancelBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Filter Selection Screen ═══ -->
+  <div class="filter-screen" id="filterScreen">
+    <div class="filter-layout">
+      <!-- Large preview -->
+      <div class="filter-preview-area">
+        <img id="filterPreviewImg" class="filter-preview-img" alt="Preview">
+      </div>
+      <!-- Sidebar with filter options -->
+      <div class="filter-sidebar">
+        <h2 class="filter-sidebar-title">Choose a Filter</h2>
+        <p class="filter-sidebar-sub">Tap a filter to preview, then press Done</p>
+        <div class="filter-options-grid" id="filterOptionsGrid"></div>
+        <button class="btn filter-done-btn" id="filterDoneBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Results Screen ═══ -->
+  <div class="results-screen" id="resultsScreen">
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processingOverlay">
+      <div class="spinner"></div>
+      <h2 class="processing-title">Processing your photos...</h2>
+      <p class="processing-sub">Creating your photobooth strip</p>
+    </div>
+
+    <!-- Results Container -->
+    <div class="results-container" id="resultsContainer" style="display:none;">
+
+      <!-- Display Area -->
+      <div class="display-area">
+
+        <!-- Photo View -->
+        <div class="photo-view active" id="photoView">
+          <img id="finalImage" class="final-preview" alt="Final photo">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="#" id="downloadBtn" class="action-btn action-btn-primary">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download
+          </a>
+          <button class="action-btn action-btn-print" id="printBtn">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 9V2h12v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="14" width="12" height="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Print
+          </button>
+          <button class="action-btn action-btn-success" id="newSessionBtn">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            New Session
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/photo-session/main.js"></script>
+</body>
+</html>
