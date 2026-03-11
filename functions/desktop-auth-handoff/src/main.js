@@ -18,12 +18,12 @@
  *   CODE_TTL_MINUTES             — Code expiry in minutes (default: 2)
  */
 
-import { Client, Databases, Query, Users, ID } from 'node-appwrite';
+import { Client, Databases, Query, Users, ID, Permission, Role } from 'node-appwrite';
 
 // ── Constants ────────────────────────────────────────────────────────
 
 const CODE_LENGTH = 48;
-const ALLOWED_ACTIONS = ['create-code', 'exchange-code'];
+const ALLOWED_ACTIONS = ['create-code', 'exchange-code', 'get-subscription', 'register-device', 'check-device'];
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -70,12 +70,24 @@ export default async ({ req, res, log, error }) => {
   const COLLECTION  = process.env.COLLECTION_DESKTOP_AUTH_CODES || 'desktop_auth_codes';
   const TTL_MINUTES = parseInt(process.env.CODE_TTL_MINUTES || '2', 10);
 
+  const COLLECTION_SUBSCRIPTIONS = process.env.COLLECTION_SUBSCRIPTIONS || 'subscriptions';
+  const COLLECTION_DEVICES = process.env.COLLECTION_DEVICES || 'devices';
+
   // ── Route to action handler ────────────────────────────────────────
   if (action === 'create-code') {
     return handleCreateCode({ req, res, log, error, databases, users, DATABASE_ID, COLLECTION, TTL_MINUTES });
   }
   if (action === 'exchange-code') {
-    return handleExchangeCode({ req, res, log, error, databases, users, client, DATABASE_ID, COLLECTION });
+    return handleExchangeCode({ req, res, log, error, databases, users, client, DATABASE_ID, COLLECTION, COLLECTION_SUBSCRIPTIONS });
+  }
+  if (action === 'get-subscription') {
+    return handleGetSubscription({ req, res, log, error, databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, body });
+  }
+  if (action === 'register-device') {
+    return handleRegisterDevice({ req, res, log, error, databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, COLLECTION_DEVICES, body });
+  }
+  if (action === 'check-device') {
+    return handleCheckDevice({ req, res, log, error, databases, DATABASE_ID, COLLECTION_DEVICES, body });
   }
 };
 
@@ -149,7 +161,7 @@ async function handleCreateCode({ req, res, log, error, databases, users, DATABA
 //  ACTION: exchange-code
 // ══════════════════════════════════════════════════════════════════════
 
-async function handleExchangeCode({ req, res, log, error, databases, users, client, DATABASE_ID, COLLECTION }) {
+async function handleExchangeCode({ req, res, log, error, databases, users, client, DATABASE_ID, COLLECTION, COLLECTION_SUBSCRIPTIONS }) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const { code } = body;
 
@@ -208,6 +220,10 @@ async function handleExchangeCode({ req, res, log, error, databases, users, clie
     // Clean up the code document
     await databases.deleteDocument(DATABASE_ID, COLLECTION, doc.$id);
 
+    // Fetch subscription state so the desktop app has it immediately
+    const subscription = await getSubscriptionState(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, user.$id);
+    log(`exchange-code: subscription for user=${doc.userId}: ${subscription.accountType} (${subscription.planName || 'none'})`);
+
     return res.json({
       ok: true,
       userId: user.$id,
@@ -217,9 +233,236 @@ async function handleExchangeCode({ req, res, log, error, databases, users, clie
       // The secret is used by the desktop app to create a session
       // via account.createSession(userId, secret)
       secret: tokenResult.secret,
+      // Subscription state included so the desktop app doesn't need a separate call
+      subscription,
     });
   } catch (err) {
     error(`exchange-code error: ${err.message}`);
     return res.json({ ok: false, error: 'Failed to exchange auth code' }, 500);
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  ACTION: get-subscription
+// ══════════════════════════════════════════════════════════════════════
+
+async function handleGetSubscription({ req, res, log, error, databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, body }) {
+  const { userId } = body;
+
+  if (!userId) {
+    return res.json({ ok: false, error: 'userId is required' }, 400);
+  }
+
+  try {
+    const subscription = await getSubscriptionState(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, userId);
+    log(`get-subscription: user=${userId} accountType=${subscription.accountType} watermark=${subscription.watermarkEnabled}`);
+    return res.json({ ok: true, ...subscription });
+  } catch (err) {
+    error(`get-subscription error: ${err.message}`);
+    return res.json({ ok: false, error: 'Failed to fetch subscription' }, 500);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  ACTION: register-device
+// ══════════════════════════════════════════════════════════════════════
+
+const DEFAULT_DEVICE_LIMIT = 2;
+
+async function handleRegisterDevice({ req, res, log, error, databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, COLLECTION_DEVICES, body }) {
+  const { userId, deviceId, deviceName, platform } = body;
+
+  if (!userId) {
+    return res.json({ ok: false, error: 'userId is required' }, 400);
+  }
+  if (!deviceId || typeof deviceId !== 'string') {
+    return res.json({ ok: false, error: 'deviceId is required' }, 400);
+  }
+  if (!deviceName || typeof deviceName !== 'string') {
+    return res.json({ ok: false, error: 'deviceName is required' }, 400);
+  }
+
+  try {
+    // 1. Get device limit from active subscription
+    const now = new Date().toISOString();
+    const subs = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_SUBSCRIPTIONS,
+      [
+        Query.equal('userId', userId),
+        Query.equal('status', 'active'),
+        Query.greaterThan('expiresAt', now),
+        Query.orderDesc('expiresAt'),
+        Query.limit(1),
+      ],
+    );
+
+    if (subs.total === 0) {
+      return res.json({ ok: false, error: 'No active subscription found' }, 403);
+    }
+
+    const subscription = subs.documents[0];
+    const deviceLimit = subscription.deviceLimit ?? DEFAULT_DEVICE_LIMIT;
+
+    // 2. Get current devices for this user
+    const existingDevices = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_DEVICES,
+      [
+        Query.equal('userId', userId),
+        Query.limit(100),
+      ],
+    );
+
+    // 3. Check if this device is already registered (idempotent)
+    const existingDevice = existingDevices.documents.find(d => d.deviceId === deviceId);
+    if (existingDevice) {
+      await databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_DEVICES,
+        existingDevice.$id,
+        {
+          lastActive: new Date().toISOString(),
+          deviceName: deviceName.slice(0, 100),
+          platform: (platform || existingDevice.platform || 'unknown').slice(0, 20),
+        },
+      );
+      log(`Device ${deviceId} already registered for user ${userId}; updated lastActive`);
+      return res.json({
+        ok: true,
+        success: true,
+        totalDevices: existingDevices.total,
+        deviceLimit,
+      });
+    }
+
+    // 4. Check device limit
+    if (existingDevices.total >= deviceLimit) {
+      log(`Device limit reached for user ${userId}: ${existingDevices.total}/${deviceLimit}`);
+      return res.json({
+        ok: false,
+        error: 'device_limit_reached',
+        message: `Device limit reached (${deviceLimit}). Remove a device to register a new one.`,
+        devices: existingDevices.documents.map(d => ({
+          $id: d.$id,
+          deviceId: d.deviceId,
+          deviceName: d.deviceName,
+          platform: d.platform,
+          lastActive: d.lastActive,
+          createdAt: d.createdAt,
+        })),
+        deviceLimit,
+      }, 429);
+    }
+
+    // 5. Create new device document
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTION_DEVICES,
+      ID.unique(),
+      {
+        userId,
+        deviceId: deviceId.slice(0, 64),
+        deviceName: deviceName.slice(0, 100),
+        platform: (platform || 'unknown').slice(0, 20),
+        lastActive: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      },
+      [
+        Permission.read(Role.user(userId)),
+        Permission.delete(Role.user(userId)),
+      ],
+    );
+
+    log(`Device ${deviceId} registered for user ${userId} (${existingDevices.total + 1}/${deviceLimit})`);
+    return res.json({
+      ok: true,
+      success: true,
+      totalDevices: existingDevices.total + 1,
+      deviceLimit,
+    });
+  } catch (err) {
+    error(`register-device error: ${err.message}`);
+    return res.json({ ok: false, error: 'Failed to register device' }, 500);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  ACTION: check-device
+// ══════════════════════════════════════════════════════════════════════
+
+async function handleCheckDevice({ req, res, log, error, databases, DATABASE_ID, COLLECTION_DEVICES, body }) {
+  const { userId, deviceId } = body;
+
+  if (!userId || !deviceId) {
+    return res.json({ ok: false, error: 'userId and deviceId are required' }, 400);
+  }
+
+  try {
+    const result = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_DEVICES,
+      [
+        Query.equal('userId', userId),
+        Query.equal('deviceId', deviceId),
+        Query.limit(1),
+      ],
+    );
+
+    const allowed = result.total > 0;
+    log(`check-device: user=${userId} device=${deviceId.slice(0, 8)}… allowed=${allowed}`);
+    return res.json({ ok: true, allowed });
+  } catch (err) {
+    error(`check-device error: ${err.message}`);
+    return res.json({ ok: false, error: 'Failed to check device' }, 500);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  SHARED: Subscription state lookup
+// ══════════════════════════════════════════════════════════════════════
+
+/**
+ * Fetch a user's subscription state from the subscriptions collection.
+ * Uses the same business rules as check-user-subscription-access.
+ */
+async function getSubscriptionState(databases, databaseId, collectionId, userId) {
+  const FREE_STATE = {
+    hasAccess: false,
+    accountType: 'free',
+    subscriptionStatus: 'none',
+    planId: null,
+    planName: null,
+    expiresAt: null,
+    watermarkEnabled: true,
+    removeWatermark: false,
+  };
+
+  const result = await databases.listDocuments(databaseId, collectionId, [
+    Query.equal('userId', userId),
+    Query.orderDesc('updatedAt'),
+    Query.limit(1),
+  ]);
+
+  if (result.total === 0) {
+    return FREE_STATE;
+  }
+
+  const sub = result.documents[0];
+  const now = new Date();
+  const expiresAt = sub.expiresAt ? new Date(sub.expiresAt) : null;
+  const isExpired = !expiresAt || expiresAt <= now;
+  const ACTIVE_STATUSES = ['active', 'canceled'];
+  const hasAccess = ACTIVE_STATUSES.includes(sub.status) && !isExpired;
+
+  return {
+    hasAccess,
+    accountType: hasAccess ? 'paid' : 'free',
+    subscriptionStatus: sub.status,
+    planId: hasAccess ? sub.planId : null,
+    planName: hasAccess ? sub.planName : null,
+    expiresAt: sub.expiresAt || null,
+    watermarkEnabled: !hasAccess,
+    removeWatermark: hasAccess,
+  };
 }
