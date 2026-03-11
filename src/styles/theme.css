@@ -1,5 +1,25 @@
 @custom-variant dark (&:is(.dark *));
 
+/* ===== Scroll & Render Performance ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Promote decorative blur orbs to their own GPU composite layers.
+   Large filter:blur elements repaint on every scroll frame without this. */
+.blur-\[80px\],
+.blur-\[120px\],
+.blur-\[60px\] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Avoid backdrop-filter layout thrash during scroll */
+[class*="backdrop-blur"] {
+  will-change: backdrop-filter;
+  transform: translateZ(0);
+}
+
 /* ===== DSLRBooth Dark Theme Design System ===== */
 :root {
   --font-size: 16px;
