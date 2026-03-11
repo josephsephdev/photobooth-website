@@ -114,7 +114,7 @@ export default function ContactUs() {
               </div>
               <div>
                 <p className="text-sm text-ev-text-muted">Email</p>
-                <p className="font-semibold text-ev-text-primary">your-email@example.com</p>
+                <p className="font-semibold text-ev-text-primary">luismiguelmoratalla47@gmail.com</p>
               </div>
             </div>
           </div>
