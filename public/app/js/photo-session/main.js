@@ -6,6 +6,7 @@ import { initSessionControls } from './session.js';
 import { initFilterScreen } from './filter.js';
 import { initWatermark } from './watermark.js';
 import { initDownload, initBrowserPrint } from './download.js';
+import { initializeReviewListeners } from './review.js';
 
 async function boot() {
   els.cache();
@@ -32,6 +33,7 @@ async function boot() {
   initSessionControls();
   initDownload();
   initBrowserPrint();
+  initializeReviewListeners();
 
   // New session button
   els.newSessionBtn.addEventListener('click', () => location.reload());

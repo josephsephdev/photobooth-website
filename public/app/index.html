@@ -179,6 +179,34 @@
       <!-- Photo previews -->
       <div class="preview-grid" id="previewGrid"></div>
 
+      <!-- Photo Review Overlay -->
+      <div class="photo-review-overlay" id="photoReviewOverlay" style="display:none;">
+        <div class="photo-review-container">
+          <div class="photo-review-image-wrapper">
+            <img id="reviewPhotoImg" class="photo-review-image" alt="Review photo">
+          </div>
+          <div class="photo-review-info">
+            <p class="photo-review-count" id="reviewPhotoCount">Photo 1 of 4</p>
+            <div class="photo-review-timer-simple">
+              <p class="photo-review-timer-text" id="reviewTimerText">Continuing in 3...</p>
+              <div class="photo-review-timer-bar">
+                <div class="photo-review-timer-fill" id="reviewTimerFill"></div>
+              </div>
+            </div>
+          </div>
+          <div class="photo-review-buttons">
+            <button class="btn btn-use-photo" id="usePhotoBtn">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Use Photo
+            </button>
+            <button class="btn btn-retake-photo" id="retakePhotoBtn">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 15A9 9 0 115.64 5.64L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Retake
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Control panel -->
       <div class="control-panel">
         <!-- Timer Selector -->

@@ -30,6 +30,13 @@ export const state = {
   // Filter selection
   selectedFilter: 'none',   // Currently selected filter key
 
+  // Photo Review (retake feature) state
+  isInReview: false,        // Whether showing photo review overlay
+  reviewPhotoData: null,    // The photo being reviewed (data URL)
+  reviewPhotoIndex: 0,      // Which photo slot is being reviewed
+  reviewAutoTimeoutId: null, // Timer ID for auto-continue
+  reviewAutoCountdown: 3,   // Countdown seconds for auto-continue
+
   // DSLR live preview (EVF) state
   _evfWebSocket: null,      // WebSocket connection for EVF streaming
   _evfActive: false,        // Whether EVF streaming is currently running

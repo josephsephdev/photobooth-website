@@ -23,6 +23,9 @@ export const els = {
     this.previewGrid = document.getElementById('previewGrid');
     this.cameraModeIndicator = document.getElementById('cameraModeIndicator');
 
+    // photo review overlay
+    this.photoReviewOverlay = document.getElementById('photoReviewOverlay');
+
     // controls
     this.startBtn = document.getElementById('startBtn');
     this.retakeBtn = document.getElementById('retakeBtn');

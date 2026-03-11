@@ -829,6 +829,263 @@ body {
 }
 
 /* ══════════════════════════
+   Photo Review Overlay
+   ══════════════════════════ */
+#photoReviewOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  animation: fadeInReview 0.3s ease-in-out;
+}
+
+@keyframes fadeInReview {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#reviewPhotoImg {
+  max-width: 90%;
+  max-height: 50vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  margin-bottom: 20px;
+  animation: scaleInPhoto 0.3s ease-out;
+}
+
+@keyframes scaleInPhoto {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+#reviewPhotoCount {
+  color: #ffffff;
+  font-size: 18px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.review-timer-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 20px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.photo-review-timer-simple {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 30px 0;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 20px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+#reviewTimerText {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  min-width: 150px;
+}
+
+.photo-review-timer-bar {
+  width: 120px;
+  height: 4px;
+  background: rgba(0, 212, 170, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 212, 170, 0.5);
+}
+
+#reviewTimerFill {
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--ev-accent), #00ffaa);
+  border-radius: 2px;
+  transform-origin: left;
+}
+
+@keyframes photoReviewTimerShrink {
+  from {
+    width: 120px;
+  }
+  to {
+    width: 0px;
+  }
+}
+
+.review-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+
+.photo-review-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+
+#usePhotoBtn,
+#retakePhotoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: .88rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--ev-radius-sm);
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  color: #fff;
+}
+
+#usePhotoBtn {
+  background: linear-gradient(135deg, var(--ev-accent), var(--ev-cyan));
+  box-shadow: 0 4px 18px var(--ev-accent-glow);
+}
+
+#usePhotoBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px var(--ev-accent-glow);
+}
+
+#usePhotoBtn:active {
+  transform: translateY(0);
+}
+
+#retakePhotoBtn {
+  background: rgba(239, 68, 68, .14);
+  border: 1px solid rgba(239, 68, 68, .3);
+  color: var(--ev-danger);
+}
+
+#retakePhotoBtn:hover {
+  background: rgba(239, 68, 68, .22);
+  border-color: var(--ev-danger);
+  box-shadow: 0 0 14px rgba(239, 68, 68, .25);
+  transform: translateY(-1px);
+}
+
+#retakePhotoBtn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 900px) {
+  #reviewPhotoImg {
+    max-height: 45vh;
+    max-width: 95%;
+  }
+
+  #reviewPhotoCount {
+    font-size: 16px;
+  }
+
+  #reviewTimerText {
+    font-size: 14px;
+    min-width: 140px;
+  }
+
+  #usePhotoBtn,
+  #retakePhotoBtn {
+    padding: 10px 24px;
+    font-size: 14px;
+  }
+
+  .photo-review-buttons {
+    gap: 12px;
+  }
+
+  .review-buttons {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  #photoReviewOverlay {
+    padding: 20px;
+  }
+
+  #reviewPhotoImg {
+    max-height: 40vh;
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+
+  #reviewPhotoCount {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .photo-review-timer-simple {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+  }
+
+  .review-timer-container {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+  }
+
+  #reviewTimerText {
+    font-size: 12px;
+    min-width: auto;
+  }
+
+  #reviewTimerFill {
+    width: 100px;
+  }
+
+  #usePhotoBtn,
+  #retakePhotoBtn {
+    padding: 10px 20px;
+    font-size: 12px;
+    flex: 1;
+  }
+
+  .photo-review-buttons {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .review-buttons {
+    gap: 10px;
+    width: 100%;
+  }
+}
+
+/* ══════════════════════════
    Filter Selection Screen
    ══════════════════════════ */
 .filter-screen {

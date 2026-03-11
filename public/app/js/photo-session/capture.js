@@ -6,6 +6,7 @@ import { captureDslrPhoto, captureWebcamPhoto } from './capture-sources.js';
 import { freezeDslrPreview, startDslrLivePreview } from './camera-ui.js';
 import { finishSession } from './finish.js';
 import { showCropGuide, hideCropGuide } from './crop-guide.js';
+import { showPhotoReview, initializeReviewListeners } from './review.js';
 
 export async function captureNextPhoto() {
   // Count only primary photo boxes (those without linkedToId)
@@ -94,21 +95,8 @@ export async function captureNextPhoto() {
     return;
   }
 
-  state.capturedPhotos.push(photoData);
-
-  // preview
-  const preview = document.createElement('img');
-  preview.src = photoData;
-  preview.className = 'preview-image';
-  els.previewGrid.appendChild(preview);
-
   els.countdown.style.display = 'none';
-  state.currentPhotoIndex++;
 
-  if (state.currentPhotoIndex < total) {
-    await sleep(2000);
-    await captureNextPhoto();
-  } else {
-    await finishSession();
-  }
+  // Show photo review overlay instead of auto-continuing
+  showPhotoReview(photoData, state.currentPhotoIndex, total);
 }
