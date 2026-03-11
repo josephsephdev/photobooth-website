@@ -65,6 +65,17 @@ export function Header() {
               </Link>
             </Button>
 
+            <Button
+              asChild
+              variant="outline"
+              className="border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary transition-all duration-300 relative group overflow-hidden"
+            >
+              <Link to="/contact-us">
+                <span className="relative z-10">Contact Us</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-ev-accent/0 via-ev-accent/10 to-ev-cyan/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Link>
+            </Button>
+
             {isAuthenticated ? (
               /* Account button — signed in */
               <Button
@@ -118,6 +129,13 @@ export function Header() {
                 className="w-full justify-start border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary"
               >
                 <Link to="/pricing" onClick={() => setIsMobileMenuOpen(false)}>Pricing</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-start border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary"
+              >
+                <Link to="/contact-us" onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>
               </Button>
 
               {isAuthenticated ? (

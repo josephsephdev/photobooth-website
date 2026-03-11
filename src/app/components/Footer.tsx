@@ -17,7 +17,7 @@ export function Footer() {
 
   const companyLinks = [
     { label: 'About / Business Info', to: '/about' },
-    { label: 'Contact Us', to: '/about' },
+    { label: 'Contact Us', to: '/contact-us' },
   ];
 
   const socialLinks = [

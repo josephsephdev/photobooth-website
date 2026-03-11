@@ -22,6 +22,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import RefundPolicy from './pages/RefundPolicy';
 import BillingConfig from './pages/BillingConfig';
+import ContactUs from './pages/ContactUs';
 
 function LandingPage() {
   return (
@@ -57,6 +58,7 @@ export default function App() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       <Route path="/refund-policy" element={<RefundPolicy />} />
+      <Route path="/contact-us" element={<ContactUs />} />
     </Routes>
   );
 }
