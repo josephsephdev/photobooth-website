@@ -4,6 +4,7 @@ import { stopStream } from './camera-ui.js';
 import { compositePhotos } from './composite.js';
 import { showFilterScreen } from './filter.js';
 import { applyWatermarkIfNeeded } from './watermark.js';
+import { registerResult } from './download.js';
 
 export async function finishSession() {
   state.isCapturing = false;
@@ -40,16 +41,24 @@ export async function finishSession() {
   });
   const compositeImage = compositeResult.dataUrl;
 
+  // Clear raw captured frames — no longer needed
+  state.capturedPhotos = [];
+
   // ── Filter Selection Step ──
   els.resultsScreen.style.display = 'none';
   els.processingOverlay.style.display = 'flex';
   const filteredImage = await showFilterScreen(compositeImage);
 
-  // ── Watermark Step (always applied in web app) ──
+  // ── Watermark Step (always applied) ──
+  if (typeof applyWatermarkIfNeeded !== 'function') {
+    console.error('Pipeline integrity check failed');
+    location.reload();
+    return;
+  }
   const finalImage = await applyWatermarkIfNeeded(filteredImage);
 
-  // ── Show final result immediately — no upload, no waiting ──
-  state.finalImageDataUrl = finalImage;
+  // ── Register result for download/print, then display ──
+  registerResult(finalImage);
   els.resultsScreen.style.display = 'block';
   els.processingOverlay.style.display = 'none';
   els.resultsContainer.style.display = 'flex';

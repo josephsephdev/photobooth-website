@@ -25,7 +25,7 @@ export const state = {
   autoPrinted: false,       // Flag to prevent duplicate prints per session
   
   // DPI from background template (for preserving metadata in output)
-  backgroundImageDPI: 96,   // DPI from template background image
+  backgroundImageDPI: 96,
 
   // Filter selection
   selectedFilter: 'none',   // Currently selected filter key

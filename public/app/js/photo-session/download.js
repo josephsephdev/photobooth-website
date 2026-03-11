@@ -1,19 +1,20 @@
-import { state } from './state.js';
 import { dataURLtoBlob } from './utils.js';
 
-/**
- * Wire up the Download button.
- * Creates a blob URL, triggers a download, then frees the blob.
- */
+let _resultUrl = null;
+
+export function registerResult(dataUrl) {
+  _resultUrl = dataUrl;
+}
+
 export function initDownload() {
   const btn = document.getElementById('downloadBtn');
   if (!btn) return;
 
   btn.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!state.finalImageDataUrl) return;
+    if (!_resultUrl) return;
 
-    const blob = dataURLtoBlob(state.finalImageDataUrl);
+    const blob = dataURLtoBlob(_resultUrl);
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
@@ -37,7 +38,7 @@ export function initBrowserPrint() {
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    if (!state.finalImageDataUrl) return;
+    if (!_resultUrl) return;
 
     const win = window.open('', '_blank');
     if (!win) {
@@ -57,7 +58,7 @@ export function initBrowserPrint() {
         </style>
       </head>
       <body>
-        <img src="${state.finalImageDataUrl}" onload="window.print(); window.close();">
+        <img src="${_resultUrl}" onload="window.print(); window.close();">
       </body>
       </html>
     `);

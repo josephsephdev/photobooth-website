@@ -9,8 +9,7 @@ import { showCropGuide, hideCropGuide } from './crop-guide.js';
 import { showPhotoReview, initializeReviewListeners } from './review.js';
 
 export async function captureNextPhoto() {
-  // Count only primary photo boxes (those without linkedToId)
-  const primaryBoxes = state.selectedTemplate?.photoBoxes?.filter(box => !box.linkedToId) || [];
+  const primaryBoxes = state.selectedTemplate?.pb?.filter(box => !box.li) || [];
   const total = primaryBoxes.length;
   if (!total) return;
 
@@ -82,7 +81,7 @@ export async function captureNextPhoto() {
     
     // Apply crop for webcam photos
     if (state.selectedTemplate) {
-      const primaryBoxes2 = state.selectedTemplate.photoBoxes.filter(box => !box.linkedToId);
+      const primaryBoxes2 = state.selectedTemplate.pb.filter(box => !box.li);
       if (state.currentPhotoIndex < primaryBoxes2.length) {
         const currentBox = primaryBoxes2[state.currentPhotoIndex];
         photoData = await applyCropToPhoto(photoData, currentBox.width, currentBox.height);

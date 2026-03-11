@@ -48,7 +48,7 @@ export async function selectTemplate(templateSummary) {
   state.selectedTemplate = templateSummary;
 
   // ⭐ Load DPI from template (for preserving in output)
-  state.backgroundImageDPI = templateSummary.backgroundImageDPI || 96;
+  state.backgroundImageDPI = templateSummary.dpi || 96;
 
   // Reset auto print flag for new session
   state.autoPrinted = false;
@@ -56,8 +56,7 @@ export async function selectTemplate(templateSummary) {
   els.templateSelectScreen.style.display = 'none';
   els.sessionScreen.style.display = 'block';
 
-  // Count only primary photo boxes (those without linkedToId)
-  const primaryBoxCount = state.selectedTemplate.photoBoxes.filter(box => !box.linkedToId).length;
+  const primaryBoxCount = state.selectedTemplate.pb.filter(box => !box.li).length;
   initProgressDots(primaryBoxCount);
   els.progressText.textContent = `Photo 1 of ${primaryBoxCount}`;
 

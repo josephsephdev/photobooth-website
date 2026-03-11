@@ -17,8 +17,8 @@ export async function loadTemplates() {
         button.className = 'template-image-button';
         button.setAttribute('aria-label', `Select ${template.name} template`);
         
-        if (template.background) {
-          button.style.backgroundImage = `url('${template.background}')`;
+        if (template.bg) {
+          button.style.backgroundImage = `url('${template.bg}')`;
           button.style.backgroundSize = 'cover';
           button.style.backgroundPosition = 'center';
         } else {

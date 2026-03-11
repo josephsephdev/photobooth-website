@@ -4,7 +4,6 @@ import { initTimerUI } from './timer.js';
 import { loadTemplates } from './templates.js';
 import { initSessionControls } from './session.js';
 import { initFilterScreen } from './filter.js';
-import { initWatermark } from './watermark.js';
 import { initDownload, initBrowserPrint } from './download.js';
 import { initializeReviewListeners } from './review.js';
 
@@ -37,9 +36,6 @@ async function boot() {
 
   // New session button
   els.newSessionBtn.addEventListener('click', () => location.reload());
-
-  // Pre-load watermark (resolves instantly — hardwired ON)
-  initWatermark();
 
   // Load template cards
   loadTemplates();

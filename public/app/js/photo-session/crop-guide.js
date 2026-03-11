@@ -52,7 +52,7 @@ export function showCropGuide(videoWidth, videoHeight) {
     return;
   }
 
-  const primaryBoxes = state.selectedTemplate.photoBoxes.filter(box => !box.linkedToId);
+  const primaryBoxes = state.selectedTemplate.pb.filter(box => !box.li);
   const currentBoxIndex = state.currentPhotoIndex;
   
   if (currentBoxIndex >= primaryBoxes.length) {

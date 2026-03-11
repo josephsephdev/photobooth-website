@@ -244,6 +244,24 @@
                 "documents.write"
             ],
             "specification": "s-0.5vcpu-512mb"
+        },
+        {
+            "$id": "apply-watermark",
+            "name": "apply-watermark",
+            "runtime": "node-22",
+            "path": "functions/apply-watermark",
+            "entrypoint": "src/main.js",
+            "execute": [
+                "any"
+            ],
+            "enabled": true,
+            "logging": true,
+            "events": [],
+            "schedule": "",
+            "timeout": 30,
+            "commands": "npm install",
+            "scopes": [],
+            "specification": "s-1vcpu-1gb"
         }
     ],
     "tablesDB": [

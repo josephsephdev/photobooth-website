@@ -23,24 +23,22 @@ export async function compositePhotos(options = {}) {
   const bg = new Image();
   await new Promise((resolve) => {
     bg.onload = resolve;
-    bg.src = state.selectedTemplate.background;
+    bg.src = state.selectedTemplate.bg;
   });
   // Scale background to match template dimensions exactly
   compositeCtx.drawImage(bg, 0, 0, state.selectedTemplate.width, state.selectedTemplate.height);
 
   // Create a map of primary box IDs to captured photos
-  const primaryBoxes = state.selectedTemplate.photoBoxes.filter(box => !box.linkedToId);
+  const primaryBoxes = state.selectedTemplate.pb.filter(box => !box.li);
   const primaryPhotoMap = {};
   primaryBoxes.forEach((box, index) => {
     primaryPhotoMap[box.id] = state.capturedPhotos[index];
   });
 
-  // Draw all boxes (both primary and duplicates) with crop-to-fill
-  for (const box of state.selectedTemplate.photoBoxes) {
-    // Determine which photo to use
-    const photoDataUrl = box.linkedToId 
-      ? primaryPhotoMap[box.linkedToId]  // Use linked primary's photo
-      : primaryPhotoMap[box.id];         // Use own photo
+  for (const box of state.selectedTemplate.pb) {
+    const photoDataUrl = box.li
+      ? primaryPhotoMap[box.li]
+      : primaryPhotoMap[box.id];
 
     if (!photoDataUrl) continue; // Skip if no photo available
 
