@@ -33,13 +33,6 @@ import { Client, Databases, ID, Users, Query, Permission, Role } from 'node-appw
 
 // ── Plan config (mirror of frontend plans — backend is source of truth) ──
 const PLANS = {
-  test: {
-    id: 'test',
-    name: 'Test Plan',
-    price: 100,         // centavos → ₱1.00
-    currency: 'PHP',
-    durationMinutes: 5, // 5-minute test period
-  },
   event_pass: {
     id: 'event_pass',
     name: 'Event Pass',
@@ -122,7 +115,10 @@ export default async ({ req, res, log, error }) => {
     const extraDevices = Math.max(0, deviceLimit - 2);
     const deviceAddOn = Math.round(periodPrice * extraDevices * 0.20);
     const totalPrice = periodPrice + deviceAddOn;
-    const totalDurationDays = plan.durationDays * durationUnits;
+    
+    // Handle both durationDays and durationMinutes plans
+    const totalDurationDays = plan.durationDays ? plan.durationDays * durationUnits : 0;
+    const totalDurationMinutes = plan.durationMinutes ? plan.durationMinutes * durationUnits : 0;
 
     // ── 2. Get the calling user ──────────────────────────────────
     const client = new Client()

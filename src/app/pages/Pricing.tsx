@@ -7,27 +7,6 @@ import { useAuth } from '../context/AuthContext';
 
 const plans = [
   {
-    id: 'test',
-    name: 'Test Plan',
-    tagline: 'For testing purposes only',
-    duration: '5 Minutes',
-    price: '₱1',
-    priceNote: 'test only',
-    description:
-      'Short-lived test plan for verifying subscription functionality, Xendit integration, and expiration timing. Not for production use.',
-    features: [
-      'Full feature access for 5 minutes',
-      'Perfect for testing expiration',
-      'Verify Xendit live mode',
-      'Test device registration',
-      'Test subscription status',
-    ],
-    icon: Zap,
-    popular: false,
-    gradient: 'from-[#ff9800] to-[#ff6f00]',
-    glowColor: 'ev-orange',
-  },
-  {
     id: 'event_pass',
     name: 'Event Pass',
     tagline: 'Perfect for one-time events',

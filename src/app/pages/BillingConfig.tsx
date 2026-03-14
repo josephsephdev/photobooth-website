@@ -17,15 +17,6 @@ const PLANS: Record<string, {
   unitLabel: string;
   durationOptions: number[];
 }> = {
-  test: {
-    id: 'test',
-    name: 'Test Plan',
-    price: 100,
-    currency: 'PHP',
-    durationMinutes: 5,
-    unitLabel: 'minute',
-    durationOptions: [5],
-  },
   event_pass: {
     id: 'event_pass',
     name: 'Event Pass',

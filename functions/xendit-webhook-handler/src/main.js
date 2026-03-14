@@ -12,7 +12,6 @@
 import { Client, Databases, ID, Query, Permission, Role } from 'node-appwrite';
 
 const PLANS = {
-  test:       { id: 'test',       name: 'Test Plan', price: 100, currency: 'PHP', durationMinutes: 5 },
   event_pass: { id: 'event_pass', name: 'Event Pass', price: 15000, currency: 'PHP', durationDays: 1 },
   monthly:    { id: 'monthly',    name: 'Pro Monthly', price: 70000, currency: 'PHP', durationDays: 30 },
   yearly:     { id: 'yearly',     name: 'Studio Annual', price: 700000, currency: 'PHP', durationDays: 365 },
