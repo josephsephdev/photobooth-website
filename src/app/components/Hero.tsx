@@ -2,8 +2,11 @@ import { motion } from 'motion/react';
 import { Camera, Download, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
+import { useDownloadUrl } from '../hooks/useDownloadUrl';
 
 export function Hero() {
+  const { downloadUrl, loading } = useDownloadUrl();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background elements */}
@@ -62,11 +65,22 @@ export function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Button
+            asChild={!!downloadUrl}
+            disabled={loading && !downloadUrl}
             size="lg"
-            className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
+            className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Download className="mr-2 h-5 w-5" />
-            Download Now
+            {downloadUrl ? (
+              <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                <Download className="mr-2 h-5 w-5 inline" />
+                Download Now
+              </a>
+            ) : (
+              <>
+                <Download className="mr-2 h-5 w-5 inline" />
+                {loading ? 'Loading...' : 'Download Now'}
+              </>
+            )}
           </Button>
 
           <Button
