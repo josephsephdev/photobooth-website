@@ -6,6 +6,17 @@
  */
 
 export const PLANS = {
+  test: {
+    id: 'test',
+    name: 'Test Plan',
+    price: 100,              // amount in centavos (₱1.00)
+    currency: 'PHP',
+    durationMinutes: 5,      // 5-minute test period
+    priceLabel: '₱1',
+    priceNote: 'test only',
+    description: 'Test plan for 5 minutes (testing purposes only).',
+    removeWatermark: true,
+  },
   event_pass: {
     id: 'event_pass',
     name: 'Event Pass',

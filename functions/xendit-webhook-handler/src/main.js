@@ -12,6 +12,7 @@
 import { Client, Databases, ID, Query, Permission, Role } from 'node-appwrite';
 
 const PLANS = {
+  test:       { id: 'test',       name: 'Test Plan', price: 100, currency: 'PHP', durationMinutes: 5 },
   event_pass: { id: 'event_pass', name: 'Event Pass', price: 15000, currency: 'PHP', durationDays: 1 },
   monthly:    { id: 'monthly',    name: 'Pro Monthly', price: 70000, currency: 'PHP', durationDays: 30 },
   yearly:     { id: 'yearly',     name: 'Studio Annual', price: 700000, currency: 'PHP', durationDays: 365 },
@@ -175,12 +176,18 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
   const userId = paymentDoc.userId;
   const now = new Date();
 
-  // Use durationDays from payment doc (set by create-xendit-subscription) with plan fallback
-  const durationDays = paymentDoc.durationDays || plan.durationDays;
+  // Use duration from payment doc (set by create-xendit-subscription) with plan fallback
+  // Support both durationDays and durationMinutes
+  const durationDays = paymentDoc.durationDays || plan.durationDays || 0;
+  const durationMinutes = paymentDoc.durationMinutes || plan.durationMinutes || 0;
   const deviceLimit = paymentDoc.deviceLimit || 2;
 
   const expiresAt = new Date(now);
-  expiresAt.setDate(expiresAt.getDate() + durationDays);
+  if (durationMinutes > 0) {
+    expiresAt.setMinutes(expiresAt.getMinutes() + durationMinutes);
+  } else if (durationDays > 0) {
+    expiresAt.setDate(expiresAt.getDate() + durationDays);
+  }
 
   const existingSubs = await databases.listDocuments(
     DATABASE_ID,
@@ -202,7 +209,11 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
     const existing = existingSubs.documents[0];
     const currentEnd = new Date(existing.expiresAt);
     const newEnd = new Date(currentEnd);
-    newEnd.setDate(newEnd.getDate() + durationDays);
+    if (durationMinutes > 0) {
+      newEnd.setMinutes(newEnd.getMinutes() + durationMinutes);
+    } else if (durationDays > 0) {
+      newEnd.setDate(newEnd.getDate() + durationDays);
+    }
 
     await databases.updateDocument(
       DATABASE_ID,

@@ -33,6 +33,13 @@ import { Client, Databases, ID, Users, Query } from 'node-appwrite';
 
 // ── Plan config (mirror of frontend plans — backend is source of truth) ──
 const PLANS = {
+  test: {
+    id: 'test',
+    name: 'Test Plan',
+    price: 100,         // centavos → ₱1.00
+    currency: 'PHP',
+    durationMinutes: 5, // 5-minute test period
+  },
   event_pass: {
     id: 'event_pass',
     name: 'Event Pass',
