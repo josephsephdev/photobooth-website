@@ -1,6 +1,6 @@
 {
   "latestVersion": "2.0.0",
   "minimumSupportedVersion": "1.9.0",
-  "downloadUrl": "https://github.com/luismoratalla/photobooth-app/releases/download/v2.0.0/Photobooth-2.0.0.exe",
+  "downloadUrl": "https://github.com/josephsephdev/photobooth-app/releases/download/v2.0.0/Photobooth-2.0.0.exe",
   "releaseNotes": "🎉 Initial release with static update system\n- Fixed asar integration\n- Added default templates\n- Implemented GitHub Pages update system\n- Graceful error handling for offline mode"
 }
