@@ -38,7 +38,7 @@ const PLANS: Record<string, {
   yearly: {
     id: 'yearly',
     name: 'Studio Annual',
-    price: 700000,
+    price: 100,
     currency: 'PHP',
     durationDays: 365,
     unitLabel: 'year',

@@ -14,7 +14,7 @@ export const PLANS = {
     durationDays: 1,
     priceLabel: '₱150',
     priceNote: 'one-time',
-    description: 'Full access for 24 hours — perfect for a single event.',
+    description: 'For one day',
     removeWatermark: true,
   },
   monthly: {
@@ -25,18 +25,18 @@ export const PLANS = {
     durationDays: 30,
     priceLabel: '₱700',
     priceNote: '/month',
-    description: 'Unlimited events per month with premium features.',
+    description: 'For growing photobooth businesses',
     removeWatermark: true,
   },
   yearly: {
     id: 'yearly',
     name: 'Studio Annual',
-    price: 700000,           // ₱7,000.00
+    price: 100,              // ₱1.00 (test price)
     currency: 'PHP',
     durationDays: 365,
     priceLabel: '₱7,000',
     priceNote: '/year',
-    description: '12-month access at the best price — save over ₱1,400.',
+    description: 'For serious long-term use',
     removeWatermark: true,
   },
 };

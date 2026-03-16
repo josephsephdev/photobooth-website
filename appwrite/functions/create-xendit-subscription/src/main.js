@@ -50,7 +50,7 @@ const PLANS = {
   yearly: {
     id: 'yearly',
     name: 'Studio Annual',
-    price: 700000,      // ₱7,000.00
+    price: 100,         // ₱1.00 (test price)
     currency: 'PHP',
     durationDays: 365,
   },
