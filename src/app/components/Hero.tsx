@@ -2,8 +2,17 @@ import { motion } from 'motion/react';
 import { Camera, Download, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
+import { useDownloadUrl } from '../hooks/useDownloadUrl';
 
 export function Hero() {
+  const { downloadUrl } = useDownloadUrl();
+
+  const handleDownload = () => {
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background elements */}
@@ -62,6 +71,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Button
+            onClick={handleDownload}
             size="lg"
             className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
           >

@@ -2,8 +2,17 @@ import { motion } from 'motion/react';
 import { Download, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
+import { useDownloadUrl } from '../hooks/useDownloadUrl';
 
 export function FinalCTA() {
+  const { downloadUrl } = useDownloadUrl();
+
+  const handleDownload = () => {
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+    }
+  };
+
   const benefits = [
     "Flexible subscription plans",
     "Full feature access",
@@ -61,6 +70,7 @@ export function FinalCTA() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
         >
           <Button
+            onClick={handleDownload}
             size="lg"
             className="text-xl px-12 py-8 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-2xl shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
           >
