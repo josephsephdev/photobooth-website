@@ -68,27 +68,6 @@ const plans = [
     gradient: 'from-[#00bcd4] to-[#0088a3]',
     glowColor: 'ev-cyan',
   },
-  {
-    id: 'test_plan',
-    name: 'Test Plan',
-    tagline: 'For testing purposes',
-    duration: '5 Minutes',
-    price: '₱1',
-    priceNote: '5 minutes',
-    description:
-      'For testing',
-    features: [
-      'Unlock all features for 5 minutes',
-      'Unlimited photo captures',
-      'Premium filters',
-      'Instant digital sharing',
-      'Watermark-free professional exports',
-    ],
-    icon: Zap,
-    popular: false,
-    gradient: 'from-[#00d4aa] to-[#00bcd4]',
-    glowColor: 'ev-accent',
-  },
 ];
 
 export default function Pricing() {

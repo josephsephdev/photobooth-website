@@ -39,17 +39,6 @@ export const PLANS = {
     description: 'For serious long-term use',
     removeWatermark: true,
   },
-  test_plan: {
-    id: 'test_plan',
-    name: 'Test Plan',
-    price: 100,              // ₱1.00
-    currency: 'PHP',
-    durationDays: 0.00347,   // ~5 minutes
-    priceLabel: '₱1',
-    priceNote: '5 minutes',
-    description: 'For testing purposes',
-    removeWatermark: true,
-  },
 };
 
 /**

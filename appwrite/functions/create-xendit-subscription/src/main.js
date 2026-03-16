@@ -54,13 +54,6 @@ const PLANS = {
     currency: 'PHP',
     durationDays: 365,
   },
-  test_plan: {
-    id: 'test_plan',
-    name: 'Test Plan',
-    price: 100,         // ₱1.00
-    currency: 'PHP',
-    durationDays: 0.00347,  // ~5 minutes
-  },
 };
 
 // Xendit invoice lifetime in seconds (30 minutes).
