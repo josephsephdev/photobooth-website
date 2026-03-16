@@ -2,7 +2,7 @@
  * Billing routes — create Xendit hosted checkout sessions.
  *
  * POST /api/billing/create-checkout
- *   Body: { planId: "event_pass" | "monthly" | "yearly" }
+ *   Body: { planId: "event_pass" | "monthly" | "yearly" | "test_plan" }
  *   Returns: { checkoutUrl }
  *
  * The backend is the source of truth for pricing.

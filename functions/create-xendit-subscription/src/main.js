@@ -109,7 +109,10 @@ export default async ({ req, res, log, error }) => {
     if (!plan) {
       return res.json({ error: 'Invalid plan selected' }, 400);
     }
-
+    // Test plan only for luis47
+    if (planId === 'test' && req.userId !== '69b3fdf6003238da94dc') {
+      return res.json({ error: 'This plan is not available' }, 403);
+    }
     // ── Dynamic pricing ──────────────────────────────────────────
     const periodPrice = plan.price * durationUnits;
     const extraDevices = Math.max(0, deviceLimit - 2);

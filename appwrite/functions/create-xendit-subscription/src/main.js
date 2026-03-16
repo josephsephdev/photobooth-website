@@ -54,6 +54,13 @@ const PLANS = {
     currency: 'PHP',
     durationDays: 365,
   },
+  test_plan: {
+    id: 'test_plan',
+    name: 'Test Plan',
+    price: 100,         // ₱1.00
+    currency: 'PHP',
+    durationDays: 0.00347,  // ~5 minutes
+  },
 };
 
 // Xendit invoice lifetime in seconds (30 minutes).
@@ -107,6 +114,7 @@ export default async function main({ req, res, log, error }) {
     if (!plan) {
       return res.json({ error: 'Invalid plan selected' }, 400);
     }
+
 
     // ── 2. Get the calling user ──────────────────────────────────
     const client = new Client()

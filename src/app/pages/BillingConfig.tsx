@@ -44,6 +44,15 @@ const PLANS: Record<string, {
     unitLabel: 'year',
     durationOptions: [1, 2, 3],
   },
+  test_plan: {
+    id: 'test_plan',
+    name: 'Test Plan',
+    price: 100,
+    currency: 'PHP',
+    durationMinutes: 5,
+    unitLabel: 'attempt',
+    durationOptions: [1],
+  },
 };
 
 const MIN_DEVICES = 2;
