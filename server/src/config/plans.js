@@ -39,6 +39,17 @@ export const PLANS = {
     description: 'For serious long-term use',
     removeWatermark: true,
   },
+  test: {
+    id: 'test',
+    name: 'Test Plan',
+    price: 100,              // ₱1.00 (1 centavo = ₱0.01, 100 = ₱1.00)
+    currency: 'PHP',
+    durationMinutes: 1,      // 1 minute for quick testing
+    priceLabel: '₱1',
+    priceNote: 'test',
+    description: 'For testing subscriptions',
+    removeWatermark: true,
+  },
 };
 
 /**

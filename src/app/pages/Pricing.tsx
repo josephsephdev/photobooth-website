@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, Check, Sparkles, Zap, Crown } from 'lucide-react';
+import { Camera, Check, Sparkles, Zap, Crown, Lightbulb } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,6 +22,8 @@ const plans = [
       'Instant digital sharing',
       'Event-branded templates',
       'Watermark-free professional exports',
+      'QR code generation for easy sharing',
+      'Google drive integration for cloud storage',
     ],
     icon: Zap,
     popular: false,
@@ -42,6 +44,8 @@ const plans = [
       'Unlimited events every month',
       'More flexibility, more value',
       'Watermark-free professional exports',
+      'QR code generation for easy sharing',
+      'Google drive integration for cloud storage',
     ],
     icon: Sparkles,
     popular: true,
@@ -62,11 +66,33 @@ const plans = [
       'Save ₱1,400+ vs paying monthly',
       'Our best-value plan',
       'Watermark-free professional exports',
+      'QR code generation for easy sharing',
+      'Google drive integration for cloud storage',
     ],
     icon: Crown,
     popular: false,
     gradient: 'from-[#00bcd4] to-[#0088a3]',
     glowColor: 'ev-cyan',
+  },
+  {
+    id: 'test',
+    name: 'Test Plan',
+    tagline: 'For testing subscriptions',
+    duration: '1 Minute',
+    price: '₱1',
+    priceNote: 'test',
+    description:
+      'For quick testing',
+    features: [
+      'All features unlocked for 1 minute',
+      'Perfect for testing workflows',
+      'Watermark-free exports',
+      'Quick testing without charges',
+    ],
+    icon: Lightbulb,
+    popular: false,
+    gradient: 'from-[#fbbf24] to-[#f97316]',
+    glowColor: 'ev-amber',
   },
 ];
 

@@ -2,11 +2,8 @@ import { motion } from 'motion/react';
 import { Download, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
-import { useDownloadUrl } from '../hooks/useDownloadUrl';
 
 export function FinalCTA() {
-  const { downloadUrl, loading } = useDownloadUrl();
-  
   const benefits = [
     "Flexible subscription plans",
     "Full feature access",
@@ -64,24 +61,12 @@ export function FinalCTA() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
         >
           <Button
-            asChild={!!downloadUrl}
-            disabled={loading && !downloadUrl}
             size="lg"
-            className="text-xl px-12 py-8 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-2xl shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-xl px-12 py-8 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-2xl shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
           >
-            {downloadUrl ? (
-              <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                <Download className="mr-3 h-6 w-6" />
-                Download Now
-                <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
-              </a>
-            ) : (
-              <>
-                <Download className="mr-3 h-6 w-6" />
-                {loading ? 'Loading...' : 'Download Now'}
-                <ArrowRight className="ml-3 h-6 w-6" />
-              </>
-            )}
+            <Download className="mr-3 h-6 w-6" />
+            Download Now
+            <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
           </Button>
           <Button
             asChild

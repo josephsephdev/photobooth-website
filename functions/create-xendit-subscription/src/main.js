@@ -54,6 +54,13 @@ const PLANS = {
     currency: 'PHP',
     durationDays: 365,
   },
+  test: {
+    id: 'test',
+    name: 'Test Plan',
+    price: 100,         // ₱1.00 for testing
+    currency: 'PHP',
+    durationMinutes: 1, // 1 minute for quick testing
+  },
 };
 
 // Xendit invoice lifetime in seconds (30 minutes).
@@ -108,10 +115,6 @@ export default async ({ req, res, log, error }) => {
     const plan = PLANS[planId];
     if (!plan) {
       return res.json({ error: 'Invalid plan selected' }, 400);
-    }
-    // Test plan only for luis47
-    if (planId === 'test' && req.userId !== '69b3fdf6003238da94dc') {
-      return res.json({ error: 'This plan is not available' }, 403);
     }
     // ── Dynamic pricing ──────────────────────────────────────────
     const periodPrice = plan.price * durationUnits;
