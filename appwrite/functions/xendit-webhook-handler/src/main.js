@@ -21,7 +21,7 @@ import { Client, Databases, ID, Query } from 'node-appwrite';
 const PLANS = {
   event_pass: { id: 'event_pass', name: 'Event Pass', price: 15000, currency: 'PHP', durationDays: 1 },
   monthly:    { id: 'monthly',    name: 'Pro Monthly', price: 70000, currency: 'PHP', durationDays: 30 },
-  yearly:     { id: 'yearly',     name: 'Studio Annual', price: 100, currency: 'PHP', durationDays: 365 },
+  yearly:     { id: 'yearly',     name: 'Studio Annual', price: 700000, currency: 'PHP', durationDays: 365 },
 };
 
 export default async function main({ req, res, log, error }) {
