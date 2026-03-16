@@ -2,8 +2,11 @@ import { motion } from 'motion/react';
 import { Camera, Download, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Link } from 'react-router';
+import { useDownloadUrl } from '../hooks/useDownloadUrl';
 
 export function Hero() {
+  const { downloadUrl, loading } = useDownloadUrl();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background elements */}
@@ -29,7 +32,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-gradient-to-r from-ev-accent to-ev-cyan bg-clip-text text-transparent leading-tight"
+          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-gradient-to-r from-ev-text-primary via-[#b0f0e0] to-[#a0e8f0] bg-clip-text text-transparent leading-tight"
         >
           Luis&Co.
           <br />
@@ -62,11 +65,22 @@ export function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Button
+            asChild={!!downloadUrl}
+            disabled={loading && !downloadUrl}
             size="lg"
-            className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group"
+            className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Download className="mr-2 h-5 w-5" />
-            Download Now
+            {downloadUrl ? (
+              <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                <Download className="mr-2 h-5 w-5 inline" />
+                Download Now
+              </a>
+            ) : (
+              <>
+                <Download className="mr-2 h-5 w-5 inline" />
+                {loading ? 'Loading...' : 'Download Now'}
+              </>
+            )}
           </Button>
 
           <Button

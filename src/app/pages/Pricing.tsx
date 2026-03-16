@@ -93,6 +93,7 @@ const plans = [
     popular: false,
     gradient: 'from-[#fbbf24] to-[#f97316]',
     glowColor: 'ev-amber',
+    hidden: true, // Disabled for production - for testing real money purchases and subscription expirations
   },
 ];
 
@@ -162,7 +163,7 @@ export default function Pricing() {
 
         {/* Pricing cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl w-full mx-auto items-stretch">
-          {plans.map((plan, index) => {
+          {plans.filter((plan) => !plan.hidden).map((plan, index) => {
             const Icon = plan.icon;
             const isHovered = hoveredCard === plan.id;
 
