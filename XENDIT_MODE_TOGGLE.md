@@ -1,103 +1,179 @@
-# Xendit Mode Toggle Guide
+# Xendit Mode Toggling Guide (Updated)
 
-## Quick Reference
+## TL;DR — Quick Commands
 
-**Your Test Mode Key:**
-```
-API KEY: xnd_development_nvOb3Cbyg7lt60XRUmqQs5zcKgoCpNRoWH59EQN6gSgN2VWnl4WyOiwm4LDSuiM
-WEBHOOK TOKEN: KoqQVhwe3lCPfWr5EusPLJVN5YCj85ypAmkisgiVV8C8yGbs
-```
+### Windows (PowerShell)
+```bash
+# Check current mode
+npm run xendit:status
 
-## Method 1: Switch via Appwrite Console (Easiest for occasional changes)
+# Toggle between test/live
+npm run xendit:toggle
 
-1. Go to **Appwrite Console** → **Functions**
-2. For each function below, update the `XENDIT_SECRET_KEY`:
-   - `create-xendit-subscription`
-   - `cancel-xendit-payment`
-   - `cancel-xendit-subscription`
-   - `renew-xendit-subscription`
-   - `sync-xendit-payment-history`
+# Go to test mode
+npm run xendit:test
 
-3. In each function's **Settings → Variables** tab:
-   - Change `XENDIT_SECRET_KEY` to your test or live key
-   - Also update `XENDIT_WEBHOOK_VERIFICATION_TOKEN` if provided
-
-4. Save and the functions will reload
-
-## Method 2: Use Configuration File (Recommended for frequent toggling)
-
-A centralized config file is already created at:
-```
-appwrite/functions/xendit-config.js
+# Go to live mode (⚠️ REAL MONEY)
+npm run xendit:live
 ```
 
-**To use this approach in your functions:**
+### Mac/Linux (Bash)
+```bash
+# Check current mode
+./toggle-xendit-mode.sh
 
-1. Update the config file to toggle the MODE:
-   ```javascript
-   const MODE = 'test'; // Change to 'live' when ready
-   ```
+# Toggle between test/live
+./toggle-xendit-mode.sh
 
-2. In each Appwrite Function, replace:
-   ```javascript
-   const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
-   ```
-   
-   With:
-   ```javascript
-   import { XENDIT_SECRET_KEY } from '../xendit-config.js';
-   const XENDIT_SECRET = XENDIT_SECRET_KEY;
-   ```
+# Go to test mode
+./toggle-xendit-mode.sh test
 
-3. Deploy functions after changes
-
-## Method 3: Use Environment Variables + Script (Most flexible)
-
-Store both keys as Appwrite environment variables:
-```
-XENDIT_SECRET_KEY_TEST=xnd_development_nvOb3Cbyg7lt60XRUmqQs5zcKgoCpNRoWH59EQN6gSgN2VWnl4WyOiwm4LDSuiM
-XENDIT_SECRET_KEY_LIVE=xnd_production_xxxxx (your production key)
-XENDIT_MODE=test
+# Go to live mode
+./toggle-xendit-mode.sh live
 ```
 
-Then in functions:
-```javascript
-const mode = process.env.XENDIT_MODE || 'test';
-const XENDIT_SECRET = mode === 'test' 
-  ? process.env.XENDIT_SECRET_KEY_TEST
-  : process.env.XENDIT_SECRET_KEY_LIVE;
+## How It Works
+
+Previously, you had to manually update Xendit credentials in the Appwrite Console for **6 different functions**. Now:
+
+1. **One config file** (`appwrite/functions/xendit-config.js`) controls all functions
+2. **One command** (`npm run xendit:toggle`) updates everything at once
+3. **Automatic Appwrite updates** via scripts
+
+## Credentials
+
+### Test Mode (Safe for Development)
+```
+Secret Key: xnd_development_nvOb3Cbyg7lt60XRUmqQs5zcKgoCpNRoWH59EQN6gSgN2VWnl4WyOiwm4LDSuiM
+Webhook: KoqQVhwe3lCPfWr5EusPLJVN5YCj85ypAmkisgiVV8C8yGbs
+Test Card: 4111 1111 1111 1111
 ```
 
-## Which Function Uses Xendit?
+### Live Mode (Real Money ⚠️)
+```
+Secret Key: xnd_production_zOsu3KMkhbVKV3tYhsNbjWohDSR7UJlt7cU43qztjJQZwyqzyxzxlspgWne
+Webhook: xwttqFPZuIA79uL2stbpig9ijRAcOiibLPxUZ3uErka1tWYD
+```
 
-These functions call the Xendit API:
-- ✅ `create-xendit-subscription` - Creates checkout
-- ✅ `cancel-xendit-payment` - Cancels pending payment
-- ✅ `cancel-xendit-subscription` - Cancels active subscription
-- ✅ `renew-xendit-subscription` - Renews subscription
-- ✅ `sync-xendit-payment-history` - Syncs payment data
-- ✅ `xendit-webhook-handler` - Receives webhook callbacks
+## Step-by-Step Workflow
 
-## Testing Your Change
+### 1. Check Current Mode
+```bash
+npm run xendit:status
+```
+Output:
+```
+🧪 Xendit is in TEST mode
+Safe to test! Use test card: 4111 1111 1111 1111
+```
 
-1. After switching modes, go to `/pricing`
-2. Select a plan
-3. You should see the checkout page from **your selected mode** (test shows "TEST MODE" watermark)
-4. Don't complete test payments with real cards!
+### 2. Toggle or Switch Modes
+```bash
+# Option A: Toggle (test → live or live → test)
+npm run xendit:toggle
 
-## Webhook Token
+# Option B: Go to specific mode
+npm run xendit:test    # Always use test
+npm run xendit:live    # Switch to live
+```
 
-When using **test mode**, also update:
-- **Xendit Dashboard** → **Webhooks/Callbacks** → Set to:
-  ```
-  Token: KoqQVhwe3lCPfWr5EusPLJVN5YCj85ypAmkisgiVV8C8yGbs
-  ```
+### 3. Verify Changes
+The script will:
+- ✅ Update `appwrite/functions/xendit-config.js`
+- ✅ Update all 6 Appwrite functions:
+  - `create-xendit-subscription`
+  - `cancel-xendit-payment`
+  - `cancel-xendit-subscription`
+  - `renew-xendit-subscription`
+  - `sync-xendit-payment-history`
+  - `xendit-webhook-handler`
 
-This ensures the `xendit-webhook-handler` function can verify incoming webhook callbacks.
+### 4. Test Your Changes
+```bash
+# Start dev server
+npm run dev
 
-## Always Use Test First!
+# Go to http://localhost:5173/pricing
+```
 
-✅ **Test first** on your local machine or staging  
-✅ **Test with fake payment details** (Xendit provides test card numbers)  
-✅ **Never** activate live mode in development  
-✅ Only switch to `live` when deploying to production
+## Function Files
+
+These Appwrite functions use Xendit:
+
+| Function | Purpose | Variables Updated |
+|----------|---------|-------------------|
+| `create-xendit-subscription` | Creates checkout session | `XENDIT_SECRET_KEY` |
+| `cancel-xendit-payment` | Cancels pending payment | `XENDIT_SECRET_KEY` |
+| `cancel-xendit-subscription` | Cancels active subscription | `XENDIT_SECRET_KEY` |
+| `renew-xendit-subscription` | Renews subscription | `XENDIT_SECRET_KEY` |
+| `sync-xendit-payment-history` | Syncs payment data | `XENDIT_SECRET_KEY` |
+| `xendit-webhook-handler` | Handles Xendit webhooks | `XENDIT_SECRET_KEY`, `XENDIT_WEBHOOK_VERIFICATION_TOKEN` |
+
+## Advanced: Manual Setup (If Scripts Don't Work)
+
+If you need to manually update Appwrite:
+
+1. Open [Appwrite Console](https://cloud.appwrite.io)
+2. Go to **Functions**
+3. For each function above:
+   - Click the function
+   - Go to **Settings → Variables**
+   - Update `XENDIT_SECRET_KEY`:
+     - Test: `xnd_development_nvOb3Cbyg7lt60XRUmqQs5zcKgoCpNRoWH59EQN6gSgN2VWnl4WyOiwm4LDSuiM`
+     - Live: `xnd_production_zOsu3KMkhbVKV3tYhsNbjWohDSR7UJlt7cU43qztjJQZwyqzyxzxlspgWne`
+   - Update `XENDIT_WEBHOOK_VERIFICATION_TOKEN`:
+     - Test: `KoqQVhwe3lCPfWr5EusPLJVN5YCj85ypAmkisgiVV8C8yGbs`
+     - Live: `xwttqFPZuIA79uL2stbpig9ijRAcOiibLPxUZ3uErka1tWYD`
+
+## Requirements
+
+- PowerShell 5.1+ (Windows) or Bash (Mac/Linux)
+- [Appwrite CLI](https://appwrite.io/docs/command-line) installed and configured
+- Your Appwrite project credentials in `~/.appwrite` (from `appwrite login`)
+
+## Troubleshooting
+
+### Scripts won't run (Windows)
+```powershell
+# Allow scripts to run once
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+npm run xendit:toggle
+```
+
+### Appwrite CLI not recognized
+```bash
+# Install Appwrite CLI
+npm install -g appwrite
+
+# Or login again
+appwrite login
+```
+
+### Still showing old credentials
+1. Check `appwrite/functions/xendit-config.js` — is MODE correct?
+2. Clear browser cache (Ctrl+Shift+Delete)
+3. Restart dev server (`npm run dev`)
+4. Check Appwrite Console to verify functions updated
+
+## Best Practices
+
+✅ **DO:**
+- Run `npm run xendit:status` before testing
+- Use test mode for development
+- Test live mode on staging before production
+- Keep both webhook URLs in Xendit settings
+
+❌ **DON'T:**
+- Forget to switch back to test after live testing
+- Use live keys in development
+- Commit production keys to git (they're already exposed here, rotate them!)
+
+## Security Note
+
+🔒 Your test keys are visible in code (safe, test-only).
+🔒 Your live keys should be rotated as they're now exposed in version history.
+
+To rotate keys:
+1. Go to [Xendit Dashboard](https://dashboard.xendit.co)
+2. Generate new keys
+3. Update `xnd_production_*` and webhook in this file and scripts

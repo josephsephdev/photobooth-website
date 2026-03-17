@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.0.5",
+  "latestVersion": "2.0.7",
   "minimumSupportedVersion": "1.9.0",
-  "downloadUrl": "https://github.com/JisooKristo/Photobooth-app-downloads/releases/download/v2.0.5/Photobooth.Setup.2.0.5.exe",
-  "releaseNotes": "🎉 v2.0.5 - Bug fixes and improvements\n- Fixed download link handling\n- Improved update notifications\n- Enhanced toast notification styling\n- Better error handling"
+  "downloadUrl": "https://github.com/JisooKristo/Photobooth-app-downloads/releases/download/v2.0.7/Photobooth.Setup.2.0.7.exe",
+  "releaseNotes": "🎉 v2.0.7 - Bug fixes and improvements\n- Fixed download link handling\n- Improved update notifications\n- Enhanced toast notification styling\n- Better error handling"
 }

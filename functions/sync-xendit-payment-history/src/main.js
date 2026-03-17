@@ -19,6 +19,8 @@ const PLANS = {
 
 export default async ({ req, res, log, error }) => {
   try {
+    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
+
     const client = new Client()
       .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
       .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
@@ -27,7 +29,6 @@ export default async ({ req, res, log, error }) => {
     const databases = new Databases(client);
     const DATABASE_ID = process.env.DATABASE_ID || 'photobooth_db';
     const COLLECTION_PAYMENTS = process.env.COLLECTION_PAYMENTS || 'payments';
-    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
 
     // ── 1. Fetch recent invoices from Xendit ─────────────────────
     const xenditRes = await fetch('https://api.xendit.co/v2/invoices?limit=50', {

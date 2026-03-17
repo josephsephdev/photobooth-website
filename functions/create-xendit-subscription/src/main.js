@@ -103,6 +103,8 @@ async function expireXenditInvoice(xenditInvoiceId, xenditSecret, log) {
 
 export default async ({ req, res, log, error }) => {
   try {
+    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
+
     // ── 1. Parse input ───────────────────────────────────────────
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body ?? {});
     const { planId } = body;
@@ -142,7 +144,6 @@ export default async ({ req, res, log, error }) => {
 
     const user = await users.get(userId);
 
-    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
     const DATABASE_ID = process.env.DATABASE_ID || 'photobooth_db';
     const COLLECTION_PAYMENTS = process.env.COLLECTION_PAYMENTS || 'payments';
 

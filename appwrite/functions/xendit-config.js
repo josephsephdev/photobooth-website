@@ -1,28 +1,24 @@
-/**
- * Xendit Configuration — Centralized Mode Toggle
+﻿/**
+ * Xendit Configuration -- Centralized Mode Toggle
  * 
- * Instead of changing XENDIT_SECRET_KEY in Appwrite Console manually,
- * all functions import this config file and use the SECRET_KEY.
- * 
- * To switch modes:
- * 1. Change MODE to 'test' or 'live'
- * 2. Deploy all functions (or just update this file in Appwrite)
- * 3. No need to update each function's environment variables separately
+ * All Appwrite functions use this single config file to get Xendit credentials.
+ * Toggle between test/live modes with: npm run xendit:toggle
  */
 
-// ── TOGGLE THIS TO SWITCH MODES ──────────────────────────────────
-const MODE = 'test'; // 'test' or 'live'
+// TOGGLE THIS TO SWITCH MODES
+const MODE = 'live';
 
-// ── Xendit Keys (keep these secure!) ──────────────────────────────
+// â”€â”€ Xendit Credentials â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const XENDIT_KEYS = {
   test: {
     secret: 'xnd_development_nvOb3Cbyg7lt60XRUmqQs5zcKgoCpNRoWH59EQN6gSgN2VWnl4WyOiwm4LDSuiM',
     webhook_token: 'KoqQVhwe3lCPfWr5EusPLJVN5YCj85ypAmkisgiVV8C8yGbs',
-    api_url: 'https://api.xendit.co', // Test and live use same API URL
+    api_url: 'https://api.xendit.co',
   },
   live: {
-    secret: process.env.XENDIT_SECRET_KEY_LIVE || 'MISSING_LIVE_KEY',
-    webhook_token: process.env.XENDIT_WEBHOOK_TOKEN_LIVE || 'MISSING_LIVE_TOKEN',
+    // Live credentials loaded from environment (more secure)
+    secret: process.env.XENDIT_SECRET_KEY_LIVE || process.env.XENDIT_SECRET_KEY || 'MISSING_LIVE_KEY',
+    webhook_token: process.env.XENDIT_WEBHOOK_TOKEN_LIVE || process.env.XENDIT_WEBHOOK_TOKEN || 'MISSING_LIVE_TOKEN',
     api_url: 'https://api.xendit.co',
   },
 };
@@ -32,7 +28,8 @@ export const XENDIT_WEBHOOK_TOKEN = XENDIT_KEYS[MODE].webhook_token;
 export const XENDIT_API_URL = XENDIT_KEYS[MODE].api_url;
 export const XENDIT_MODE = MODE;
 
-// Debug: Log which mode is active (remove in production if desired)
+// Debug logging
 if (typeof process !== 'undefined' && process.stdout) {
-  console.log(`[Xendit] Using ${MODE.toUpperCase()} mode`);
+  const icon = MODE === 'test' ? 'ðŸ§ª' : 'ðŸ”´';
+  console.log(`${icon} [Xendit Config] Using ${MODE.toUpperCase()} mode`);
 }

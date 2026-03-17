@@ -93,7 +93,7 @@ const plans = [
     popular: false,
     gradient: 'from-[#fbbf24] to-[#f97316]',
     glowColor: 'ev-amber',
-    hidden: true, // Disabled for production - for testing real money purchases and subscription expirations
+    hidden: false, // Enabled for testing - for testing real money purchases and subscription expirations
   },
 ];
 

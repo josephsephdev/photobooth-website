@@ -56,6 +56,8 @@ export default async ({ req, res, log, error }) => {
       }
 
       // 1. Get device limit from active subscription
+      // Free users (no active subscription) have unlimited devices
+      // Paid users have a device limit from their subscription
       const now = new Date().toISOString();
       const subs = await databases.listDocuments(
         DATABASE_ID,
@@ -69,12 +71,10 @@ export default async ({ req, res, log, error }) => {
         ],
       );
 
-      if (subs.total === 0) {
-        return res.json({ error: 'No active subscription found' }, 403);
-      }
-
-      const subscription = subs.documents[0];
-      const deviceLimit = subscription.deviceLimit ?? DEFAULT_DEVICE_LIMIT;
+      const hasActiveSubscription = subs.total > 0;
+      const deviceLimit = hasActiveSubscription
+        ? (subs.documents[0].deviceLimit ?? DEFAULT_DEVICE_LIMIT)
+        : null; // null = unlimited for free users
 
       // 2. Get current devices for this user
       const existingDevices = await databases.listDocuments(
@@ -108,8 +108,8 @@ export default async ({ req, res, log, error }) => {
         });
       }
 
-      // 4. Check device limit
-      if (existingDevices.total >= deviceLimit) {
+      // 4. Check device limit (only for paid users with a subscription)
+      if (deviceLimit !== null && existingDevices.total >= deviceLimit) {
         log(`Device limit reached for user ${userId}: ${existingDevices.total}/${deviceLimit}`);
         return res.json({
           error: 'device_limit_reached',

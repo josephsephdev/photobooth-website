@@ -20,8 +20,9 @@ const PLANS = {
 
 export default async ({ req, res, log, error }) => {
   try {
-    // ── 1. Verify webhook authenticity ───────────────────────────
     const WEBHOOK_TOKEN = process.env.XENDIT_WEBHOOK_VERIFICATION_TOKEN || '';
+
+    // ── 1. Verify webhook authenticity ───────────────────────────
     const callbackToken = req.headers['x-callback-token'];
 
     if (!callbackToken || callbackToken !== WEBHOOK_TOKEN) {
@@ -50,6 +51,7 @@ export default async ({ req, res, log, error }) => {
     const DATABASE_ID = process.env.DATABASE_ID || 'photobooth_db';
     const COLLECTION_PAYMENTS = process.env.COLLECTION_PAYMENTS || 'payments';
     const COLLECTION_SUBSCRIPTIONS = process.env.COLLECTION_SUBSCRIPTIONS || 'subscriptions';
+    const COLLECTION_DEVICES = process.env.COLLECTION_DEVICES || 'devices';
 
     // ── 4. Look up the payment record ────────────────────────────
     const paymentsList = await databases.listDocuments(
@@ -92,7 +94,7 @@ export default async ({ req, res, log, error }) => {
       log(`Payment ${paymentDoc.$id} marked as paid`);
       
       // Activate subscription only on successful payment
-      await activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, paymentDoc, log);
+      await activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, COLLECTION_DEVICES, paymentDoc, log);
 
     } else if (status === 'EXPIRED' || status === 'FAILED') {
       // IDEMPOTENT CHECK: Skip if already in final state
@@ -164,7 +166,7 @@ function extractPlanId(externalId) {
 
 // ── Subscription activation helper ───────────────────────────────
 
-async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, paymentDoc, log) {
+async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPTIONS, COLLECTION_DEVICES, paymentDoc, log) {
   const planId = extractPlanId(paymentDoc.providerPaymentId);
 
   const plan = PLANS[planId];
@@ -254,5 +256,23 @@ async function activateSubscription(databases, DATABASE_ID, COLLECTION_SUBSCRIPT
     );
 
     log(`New subscription created for user ${userId} until ${expiresAt.toISOString()}`);
+  }
+
+  // 3. Clean up all existing devices when subscription is activated
+  // This ensures the user starts fresh with their new device limit
+  const userDevices = await databases.listDocuments(
+    DATABASE_ID,
+    COLLECTION_DEVICES,
+    [Query.equal('userId', userId), Query.limit(100)],
+  );
+
+  let deletedCount = 0;
+  for (const device of userDevices.documents) {
+    await databases.deleteDocument(DATABASE_ID, COLLECTION_DEVICES, device.$id);
+    deletedCount++;
+  }
+
+  if (deletedCount > 0) {
+    log(`Cleared ${deletedCount} registered devices for user ${userId} after subscription activation`);
   }
 }

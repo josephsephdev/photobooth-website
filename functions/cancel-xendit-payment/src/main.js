@@ -49,6 +49,8 @@ export default async function main({ req, res, log, error }) {
       return res.json({ error: 'paymentId is required' }, 400);
     }
 
+    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
+
     const client = new Client()
       .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
       .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
@@ -56,7 +58,6 @@ export default async function main({ req, res, log, error }) {
     const databases = new Databases(client);
     const DATABASE_ID = process.env.DATABASE_ID || 'photobooth_db';
     const COLLECTION_PAYMENTS = process.env.COLLECTION_PAYMENTS || 'payments';
-    const XENDIT_SECRET = process.env.XENDIT_SECRET_KEY;
 
     // ── 1. Fetch payment document ──────────────────────────────
     const paymentDoc = await databases.getDocument(
