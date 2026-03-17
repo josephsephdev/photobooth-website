@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Sparkles, Zap, Layers, Play } from 'lucide-react';
+import { Sparkles, Layers, Play } from 'lucide-react';
 
 export function ProductShowcase() {
   const showcaseItems = [
@@ -13,7 +13,8 @@ export function ProductShowcase() {
     {
       title: "Google Drive Integration",
       description: "Securely back up event photos to your Google Drive for easy access and sharing",
-      icon: Zap,
+      icon: null,
+      customIcon: "/google-drive-icon.png",
       image: "https://image2url.com/r2/default/images/1772632931370-ba4c32f2-59bb-4493-8872-c0cdf612e593.png"
     },
     {
@@ -63,7 +64,11 @@ export function ProductShowcase() {
 
                   <div className="absolute top-4 left-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00d4aa]/20 to-[#00bcd4]/20 border border-ev-accent/30 flex items-center justify-center">
-                      <item.icon className="w-6 h-6 text-ev-accent" />
+                      {item.customIcon ? (
+                        <img src={item.customIcon} alt={item.title} className="w-6 h-6 object-contain" />
+                      ) : (
+                        item.icon && <item.icon className="w-6 h-6 text-ev-accent" />
+                      )}
                     </div>
                   </div>
                 </div>

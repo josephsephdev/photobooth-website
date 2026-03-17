@@ -89,7 +89,7 @@ export function BusinessIdentity() {
             {
               icon: Mail,
               title: 'Contact',
-              content: 'support@luiscophotobooth.app',
+              content: 'luiscophotobooth@gmail.com',
               subtitle: 'Business inquiries welcome',
             },
             {

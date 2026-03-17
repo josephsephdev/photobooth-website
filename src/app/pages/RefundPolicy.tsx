@@ -97,7 +97,7 @@ export default function RefundPolicy() {
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
               <h2 className="text-2xl font-bold text-ev-text-primary">5. How to Request a Refund</h2>
               <p className="text-ev-text-secondary leading-relaxed">
-                To request a refund, please contact our support team at <strong className="text-ev-accent">support@luiscophotobooth.app</strong> with the following information:
+                To request a refund, please contact our support team at <strong className="text-ev-accent">luiscophotobooth@gmail.com</strong> with the following information:
               </p>
               <ul className="list-disc list-inside space-y-2 text-ev-text-secondary">
                 <li>Your registered email address.</li>
@@ -113,7 +113,7 @@ export default function RefundPolicy() {
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
               <h2 className="text-2xl font-bold text-ev-text-primary">6. Payment Disputes</h2>
               <p className="text-ev-text-secondary leading-relaxed">
-                If you believe you have been charged in error, please contact us at <strong className="text-ev-accent">support@luiscophotobooth.app</strong> before initiating a dispute with your payment provider. We are committed to resolving billing issues promptly and fairly.
+                If you believe you have been charged in error, please contact us at <strong className="text-ev-accent">luiscophotobooth@gmail.com</strong> before initiating a dispute with your payment provider. We are committed to resolving billing issues promptly and fairly.
               </p>
             </section>
 

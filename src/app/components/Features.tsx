@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Camera, Sparkles, Zap, Share2, Cloud, Printer, Layout, Gauge } from 'lucide-react';
+import { Camera, Film, Zap, Share2, Printer, Layout, Briefcase } from 'lucide-react';
 
 export function Features() {
   const features = [
@@ -22,7 +22,7 @@ export function Features() {
       gradient: "from-[#f59e0b] to-[#d97706]"
     },
     {
-      icon: Sparkles,
+      icon: Film,
       title: "GIF Creation",
       description: "Capture moments in motion with animated GIF support and custom effects",
       gradient: "from-[#e040fb] to-[#ab47bc]"
@@ -34,7 +34,8 @@ export function Features() {
       gradient: "from-[#22c55e] to-[#16a34a]"
     },
     {
-      icon: Cloud,
+      icon: null,
+      customIcon: "/google-drive-icon.png",
       title: "Google Drive Upload",
       description: "Automatic cloud backup and organization directly to Google Drive",
       gradient: "from-[#00bcd4] to-[#00d4aa]"
@@ -46,7 +47,7 @@ export function Features() {
       gradient: "from-[#ef4444] to-[#dc2626]"
     },
     {
-      icon: Gauge,
+      icon: Briefcase,
       title: "Event-Ready Workflow",
       description: "Complete event management system designed for high-volume sessions",
       gradient: "from-[#e040fb] to-[#00d4aa]"
@@ -93,7 +94,11 @@ export function Features() {
                 <div className="relative h-full bg-gradient-to-br from-ev-surface/90 to-ev-surface-elevated/90 rounded-2xl p-8 border border-ev-border group-hover:border-[rgba(0,212,170,0.3)] transition-colors duration-200">
                   {/* Icon */}
                   <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.gradient} bg-opacity-10 mb-6`}>
-                    <feature.icon className={`w-8 h-8 bg-gradient-to-br ${feature.gradient} bg-clip-text text-transparent`} style={{ WebkitTextFillColor: 'transparent', backgroundClip: 'text' }} />
+                    {feature.customIcon ? (
+                      <img src={feature.customIcon} alt={feature.title} className="w-8 h-8 object-contain" />
+                    ) : (
+                      feature.icon && <feature.icon className={`w-8 h-8 bg-gradient-to-br ${feature.gradient} bg-clip-text text-transparent`} style={{ WebkitTextFillColor: 'transparent', backgroundClip: 'text' }} />
+                    )}
                   </div>
 
                   <h3 className="text-2xl font-bold text-ev-text-primary mb-4">{feature.title}</h3>

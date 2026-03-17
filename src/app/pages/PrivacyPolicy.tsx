@@ -136,7 +136,7 @@ export default function PrivacyPolicy() {
                 <li>Opt out of non-essential communications.</li>
               </ul>
               <p className="text-ev-text-secondary leading-relaxed">
-                To exercise any of these rights, please contact us at <strong className="text-ev-accent">support@luiscophotobooth.app</strong>.
+                To exercise any of these rights, please contact us at <strong className="text-ev-accent">luiscophotobooth@gmail.com</strong>.
               </p>
             </section>
 
