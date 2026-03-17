@@ -19,6 +19,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import VerifyEmailSent from './pages/VerifyEmailSent';
 import About from './pages/About';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import TermsAndConditions from './pages/TermsAndConditions';
 import RefundPolicy from './pages/RefundPolicy';
 import BillingConfig from './pages/BillingConfig';
@@ -56,6 +57,7 @@ export default function App() {
       <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
       <Route path="/about" element={<About />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       <Route path="/refund-policy" element={<RefundPolicy />} />
       <Route path="/contact-us" element={<ContactUs />} />

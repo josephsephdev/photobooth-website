@@ -10,6 +10,7 @@ export function Footer() {
   ];
 
   const legalLinks = [
+    { label: 'Terms of Service', to: '/terms-of-service' },
     { label: 'Privacy Policy', to: '/privacy-policy' },
     { label: 'Terms and Conditions', to: '/terms-and-conditions' },
     { label: 'Refund & Cancellation Policy', to: '/refund-policy' },

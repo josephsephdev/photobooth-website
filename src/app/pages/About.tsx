@@ -124,7 +124,7 @@ export default function About() {
               { icon: Globe, label: 'Website', value: 'luiscophotobooth.app' },
               { icon: CreditCard, label: 'Business Type', value: 'Digital Apps & Subscriptions (SaaS)' },
               { icon: MapPin, label: 'Country of Operation', value: 'Philippines' },
-              { icon: Mail, label: 'Contact Email', value: 'support@luiscophotobooth.app' },
+              { icon: Mail, label: 'Contact Email', value: 'luiscophotobooth@gmail.com' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4 bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-xl p-5 border border-ev-border">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-[#00d4aa]/15 to-[#00bcd4]/15 flex items-center justify-center">

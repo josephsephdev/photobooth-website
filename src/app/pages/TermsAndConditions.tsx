@@ -162,7 +162,7 @@ export default function TermsAndConditions() {
                 <p><strong className="text-ev-text-primary">Business Name:</strong> LUIS&CO. ONLINE SHOP</p>
                 <p><strong className="text-ev-text-primary">Product:</strong> Luis&Co. Photobooth App</p>
                 <p><strong className="text-ev-text-primary">Website:</strong> https://luiscophotobooth.app</p>
-                <p><strong className="text-ev-text-primary">Email:</strong> <span className="text-ev-accent">support@luiscophotobooth.app</span></p>
+                <p><strong className="text-ev-text-primary">Email:</strong> <span className="text-ev-accent">luiscophotobooth@gmail.com</span></p>
               </div>
             </section>
           </div>

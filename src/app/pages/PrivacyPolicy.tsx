@@ -87,14 +87,47 @@ export default function PrivacyPolicy() {
             </section>
 
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
-              <h2 className="text-2xl font-bold text-ev-text-primary">5. Data Security</h2>
+              <h2 className="text-2xl font-bold text-ev-text-primary">5. How We Use Google User Data</h2>
+              <p className="text-ev-text-secondary leading-relaxed">
+                <strong className="text-ev-text-primary">LuisCo Photobooth</strong> accesses your Google Drive to provide cloud storage and sharing features for your photobooth events.
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-bold text-ev-text-primary mb-2">Data Access</h3>
+                  <p className="text-ev-text-secondary leading-relaxed">
+                    Our app requests the drive.file scope. This allows us to create a dedicated folder (e.g., "[Event Name]") on your Google Drive and upload only the photos and videos captured during your event sessions.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold text-ev-text-primary mb-2">Data Storage & Sharing</h3>
+                  <p className="text-ev-text-secondary leading-relaxed">
+                    Photos are stored directly on your personal Google Drive. To enable guest sharing via QR code, our app generates a public sharing link for these specific files/folders as instructed by you.
+                  </p>
+                </div>
+                <div className="bg-ev-surface/50 border-l-4 border-ev-accent p-4 rounded">
+                  <h3 className="font-bold text-ev-accent mb-2">Limited Use Disclosure</h3>
+                  <p className="text-ev-text-secondary leading-relaxed">
+                    <strong>LuisCo Photobooth's use and transfer of information received from Google APIs to any other app will adhere to <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-ev-accent hover:text-ev-accent-hover underline">Google API Services User Data Policy</a>, including the Limited Use requirements.</strong>
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold text-ev-text-primary mb-2">Data Retention</h3>
+                  <p className="text-ev-text-secondary leading-relaxed">
+                    We do not store your Google credentials or files on our own servers. Your data remains in your Google Drive and is governed by your own Google account settings.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
+              <h2 className="text-2xl font-bold text-ev-text-primary">6. Data Security</h2>
               <p className="text-ev-text-secondary leading-relaxed">
                 We implement reasonable security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.
               </p>
             </section>
 
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
-              <h2 className="text-2xl font-bold text-ev-text-primary">6. Your Rights</h2>
+              <h2 className="text-2xl font-bold text-ev-text-primary">7. Your Rights</h2>
               <p className="text-ev-text-secondary leading-relaxed">You have the right to:</p>
               <ul className="list-disc list-inside space-y-2 text-ev-text-secondary">
                 <li>Access and review the personal information we hold about you.</li>
@@ -108,28 +141,28 @@ export default function PrivacyPolicy() {
             </section>
 
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
-              <h2 className="text-2xl font-bold text-ev-text-primary">7. Cookies & Tracking</h2>
+              <h2 className="text-2xl font-bold text-ev-text-primary">8. Cookies & Tracking</h2>
               <p className="text-ev-text-secondary leading-relaxed">
                 Our website may use cookies and similar technologies to improve your browsing experience, analyze site traffic, and understand usage patterns. You can control cookie preferences through your browser settings.
               </p>
             </section>
 
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
-              <h2 className="text-2xl font-bold text-ev-text-primary">8. Children's Privacy</h2>
+              <h2 className="text-2xl font-bold text-ev-text-primary">9. Children's Privacy</h2>
               <p className="text-ev-text-secondary leading-relaxed">
                 Our services are not directed to children under 13 years of age. We do not knowingly collect personal information from children. If we become aware that we have collected data from a child without appropriate consent, we will take steps to delete that information.
               </p>
             </section>
 
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
-              <h2 className="text-2xl font-bold text-ev-text-primary">9. Changes to This Policy</h2>
+              <h2 className="text-2xl font-bold text-ev-text-primary">10. Changes to This Policy</h2>
               <p className="text-ev-text-secondary leading-relaxed">
                 We may update this Privacy Policy from time to time. When we do, we will revise the "Last updated" date at the top of this page. We encourage you to review this page periodically for any changes.
               </p>
             </section>
 
             <section className="bg-gradient-to-br from-ev-surface/80 to-ev-surface-elevated/80 rounded-2xl p-8 border border-ev-border space-y-4">
-              <h2 className="text-2xl font-bold text-ev-text-primary">10. Contact Us</h2>
+              <h2 className="text-2xl font-bold text-ev-text-primary">11. Contact Us</h2>
               <p className="text-ev-text-secondary leading-relaxed">
                 If you have any questions about this Privacy Policy, please contact us:
               </p>
@@ -137,7 +170,7 @@ export default function PrivacyPolicy() {
                 <p><strong className="text-ev-text-primary">Business Name:</strong> LUIS&CO. ONLINE SHOP</p>
                 <p><strong className="text-ev-text-primary">Product:</strong> Luis&Co. Photobooth App</p>
                 <p><strong className="text-ev-text-primary">Website:</strong> https://luiscophotobooth.app</p>
-                <p><strong className="text-ev-text-primary">Email:</strong> <span className="text-ev-accent">support@luiscophotobooth.app</span></p>
+                <p><strong className="text-ev-text-primary">Email:</strong> <span className="text-ev-accent">luiscophotobooth@gmail.com</span></p>
               </div>
             </section>
           </div>
