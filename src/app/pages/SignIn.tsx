@@ -14,6 +14,7 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const { signIn, signOut, isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -31,6 +32,7 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setUnverifiedEmail('');
     setSubmitting(true);
     try {
       // If there's already an active session, sign out first so we can sign in fresh
@@ -56,7 +58,14 @@ export default function SignIn() {
 
       navigate('/account');
     } catch (err: any) {
-      setError(err.message || 'Sign in failed');
+      const errorMsg = err.message || 'Sign in failed';
+      
+      // Check if this is an unverified email error
+      if (errorMsg.includes('verify your email')) {
+        setUnverifiedEmail(email);
+      }
+      
+      setError(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -214,13 +223,28 @@ export default function SignIn() {
 
               {/* Forgot Password */}
               <div className="flex items-center justify-between">
-                {error && <p className="text-xs text-ev-danger">{error}</p>}
-                <button
-                  type="button"
-                  className="text-sm text-ev-accent hover:text-ev-accent-hover transition-colors ml-auto"
+                {error && (
+                  <div className="text-xs text-ev-danger flex-1">
+                    {error}
+                    {unverifiedEmail && (
+                      <>
+                        {' '}
+                        <Link
+                          to="/request-verification-email"
+                          className="underline hover:text-ev-danger-hover font-medium"
+                        >
+                          Resend verification email
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                )}
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-ev-accent hover:text-ev-accent-hover transition-colors ml-auto font-medium"
                 >
                   Forgot password?
-                </button>
+                </Link>
               </div>
 
               {/* Submit */}

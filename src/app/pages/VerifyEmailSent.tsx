@@ -2,16 +2,73 @@
  * VerifyEmailSent — shown immediately after signup.
  * Tells the user to check their email for a verification link.
  * User is NOT signed in at this point — they must verify first.
+ *
+ * Features:
+ *   - "Open Gmail" button for quick access
+ *   - "Resend verification email" button with cooldown (prevents spam)
+ *   - Shows success/error states
  */
 
 import { Link, useLocation } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, Mail, ExternalLink } from 'lucide-react';
+import { Camera, Mail, ExternalLink, Check, AlertCircle, Loader2, RotateCcw } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
+import { useAuth } from '../context/AuthContext';
+
+const RESEND_COOLDOWN_SECONDS = 60; // Wait 60 seconds before allowing another resend
 
 export default function VerifyEmailSent() {
   const location = useLocation();
   const email = (location.state as { email?: string })?.email;
+  
+  const { sendVerification } = useAuth();
+  
+  // Resend state
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendError, setResendError] = useState('');
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+    
+    const timer = setInterval(() => {
+      setCooldownSeconds(prev => prev - 1);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [cooldownSeconds]);
+
+  // Auto-clear success message after 5 seconds
+  useEffect(() => {
+    if (!resendSuccess) return;
+    const timer = setTimeout(() => setResendSuccess(false), 5000);
+    return () => clearTimeout(timer);
+  }, [resendSuccess]);
+
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    setResendError('');
+    setResendSuccess(false);
+
+    try {
+      await sendVerification();
+      setResendSuccess(true);
+      setCooldownSeconds(RESEND_COOLDOWN_SECONDS);
+    } catch (err: any) {
+      setResendError(err.message || 'Failed to resend verification email. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const isResendDisabled = isResending || cooldownSeconds > 0;
+  const resendButtonText = 
+    isResending ? 'Sending…' :
+    cooldownSeconds > 0 ? `Resend in ${cooldownSeconds}s` :
+    'Resend verification email';
 
   return (
     <div className="min-h-screen text-ev-text-primary flex flex-col">
@@ -58,6 +115,32 @@ export default function VerifyEmailSent() {
               Click the link in the email to verify your account. Once verified, you can sign in. If you don't see it, check your spam folder.
             </p>
 
+            {/* Success Message */}
+            {resendSuccess && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-4 p-3 rounded-lg bg-ev-success/15 border border-ev-success/30 flex items-center gap-2"
+              >
+                <Check className="w-4 h-4 text-ev-success flex-shrink-0" />
+                <p className="text-sm text-ev-success">Verification email sent successfully!</p>
+              </motion.div>
+            )}
+
+            {/* Error Message */}
+            {resendError && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-4 p-3 rounded-lg bg-ev-danger/15 border border-ev-danger/30 flex items-center gap-2"
+              >
+                <AlertCircle className="w-4 h-4 text-ev-danger flex-shrink-0" />
+                <p className="text-sm text-ev-danger">{resendError}</p>
+              </motion.div>
+            )}
+
             <div className="flex flex-col gap-3">
               <Button
                 asChild
@@ -68,6 +151,30 @@ export default function VerifyEmailSent() {
                   Open Gmail
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
+              </Button>
+
+              {/* Resend Button */}
+              <Button
+                onClick={handleResendVerification}
+                disabled={isResendDisabled}
+                className="w-full bg-ev-surface/50 hover:bg-ev-surface border border-ev-border/60 hover:border-ev-accent/50 text-ev-text-primary font-semibold transition-all duration-300 disabled:opacity-60"
+              >
+                {isResending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {resendButtonText}
+                  </>
+                ) : cooldownSeconds > 0 ? (
+                  <>
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    {resendButtonText}
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    {resendButtonText}
+                  </>
+                )}
               </Button>
 
               <Button

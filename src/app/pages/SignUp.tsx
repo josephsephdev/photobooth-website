@@ -52,9 +52,11 @@ export default function SignUp() {
     setSubmitting(true);
     try {
       // If there's already an active session, sign out first
+      // (This handles both verified AND unverified sessions)
       if (isAuthenticated) {
         await signOut();
       }
+      
       await signUp(email, password, fullName.trim());
 
       // ── Desktop app callback ──────────────────────────────────

@@ -35,16 +35,29 @@ export interface SignUpParams {
  * Create a new user account.
  *
  * Flow:
- *  1. account.create()           — register user in Appwrite Auth
- *  2. account.createEmailPasswordSession() — session needed for verification email + link
- *  3. sendVerificationEmail()    — send "verify your email" email
+ *  1. Clear any existing session (to prevent "session is active" error)
+ *  2. account.create()           — register user in Appwrite Auth
+ *  3. account.createEmailPasswordSession() — session needed for verification email + link
+ *  4. sendVerificationEmail()    — send "verify your email" email
+ *  5. If email verification fails, delete the user account
  *
  * NOTE: Session is kept active so `updateVerification` works when the user
  *       clicks the verification link. The AuthContext does NOT treat unverified
  *       users as authenticated, so the session alone doesn't grant access.
  *       Profile document is only created after email verification is complete.
+ *
+ * ⚠️  FIXES:
+ *     - Clears any stale sessions before creating the account (prevents "session is active" errors)
+ *     - If email verification fails, the newly created account is deleted to prevent orphaned unverified accounts
  */
 export async function createAccount({ email, password, fullName }: SignUpParams) {
+  // 0. Clear any existing session (e.g., leftover from previous signup attempt)
+  try {
+    await account.deleteSession('current');
+  } catch {
+    // No session exists — that's fine
+  }
+
   // 1. Create the Appwrite user
   const newUser = await account.create(
     ID.unique(),
@@ -56,8 +69,20 @@ export async function createAccount({ email, password, fullName }: SignUpParams)
   // 2. Create a session (needed for sending verification + completing it later)
   await account.createEmailPasswordSession(email, password);
 
-  // 3. Send email verification
-  await sendVerificationEmail();
+  // 3. Send email verification (with error handling)
+  try {
+    await sendVerificationEmail();
+  } catch (emailError) {
+    // If email verification fails, delete the account that was just created
+    // to prevent orphaned unverified accounts
+    try {
+      await account.delete();
+    } catch (deleteError) {
+      console.error('Failed to clean up account after email verification failure:', deleteError);
+    }
+    // Re-throw the original email error
+    throw emailError;
+  }
 
   return newUser;
 }
@@ -116,6 +141,31 @@ export async function sendVerificationEmail() {
  */
 export async function completeVerification(userId: string, secret: string) {
   await account.updateVerification(userId, secret);
+}
+
+/**
+ * Change password for the currently logged-in user.
+ * Requires the user to provide their current password as verification.
+ */
+export async function changePassword(currentPassword: string, newPassword: string) {
+  await account.updatePassword(newPassword, currentPassword);
+}
+
+/**
+ * Request a password reset email.
+ * Sends an email with a recovery link to the user.
+ */
+export async function requestPasswordReset(email: string) {
+  const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
+  await account.createRecovery(email, `${appUrl}/reset-password`);
+}
+
+/**
+ * Complete password reset after the user clicks the recovery link.
+ * Called with the userId and secret from the URL params.
+ */
+export async function completePasswordReset(userId: string, secret: string, newPassword: string) {
+  await account.updateRecovery(userId, secret, newPassword);
 }
 
 // ── Profile Helper ─────────────────────────────────────────────────

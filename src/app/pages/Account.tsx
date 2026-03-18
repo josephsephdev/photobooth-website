@@ -141,6 +141,15 @@ export default function Account() {
   const [cancelSuccess, setCancelSuccess] = useState<string | null>(null);
   const [devices, setDevices] = useState<DeviceDocument[]>([]);
   const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [changePasswordState, setChangePasswordState] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+    loading: false,
+    error: '',
+    success: false,
+  });
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
@@ -209,6 +218,54 @@ export default function Account() {
       console.error('Remove device error:', err);
     } finally {
       setRemovingDeviceId(null);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { currentPassword, newPassword, confirmPassword } = changePasswordState;
+
+    // Validation
+    if (!currentPassword.trim()) {
+      setChangePasswordState(prev => ({ ...prev, error: 'Current password is required' }));
+      return;
+    }
+    if (!newPassword.trim()) {
+      setChangePasswordState(prev => ({ ...prev, error: 'New password is required' }));
+      return;
+    }
+    if (newPassword.length < 8) {
+      setChangePasswordState(prev => ({ ...prev, error: 'New password must be at least 8 characters' }));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setChangePasswordState(prev => ({ ...prev, error: 'Passwords do not match' }));
+      return;
+    }
+
+    setChangePasswordState(prev => ({ ...prev, loading: true, error: '', success: false }));
+
+    try {
+      const { changePassword: changePasswordFn } = await import('../lib/auth.service');
+      await changePasswordFn(currentPassword, newPassword);
+      
+      setChangePasswordState(prev => ({
+        ...prev,
+        loading: false,
+        success: true,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      }));
+
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setShowChangePasswordModal(false);
+        setChangePasswordState(prev => ({ ...prev, success: false }));
+      }, 2000);
+    } catch (err: any) {
+      const message = err?.message || 'Failed to change password';
+      setChangePasswordState(prev => ({ ...prev, loading: false, error: message }));
     }
   };
 
@@ -286,13 +343,7 @@ export default function Account() {
                 variant="outline"
                 size="sm"
                 className="border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary text-xs gap-1.5 transition-all"
-              >
-                <Settings className="w-3.5 h-3.5" /> Edit Profile
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary text-xs gap-1.5 transition-all"
+                onClick={() => setShowChangePasswordModal(true)}
               >
                 <Shield className="w-3.5 h-3.5" /> Change Password
               </Button>
@@ -609,6 +660,139 @@ export default function Account() {
           </div>
         </div>
       </div>
+
+      {/* ============ Change Password Modal ============ */}
+      {showChangePasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-md bg-ev-surface/90 backdrop-blur-xl border border-ev-border/60 rounded-2xl p-6 shadow-2xl"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-ev-text-primary">Change Password</h2>
+              <button
+                onClick={() => {
+                  setShowChangePasswordModal(false);
+                  setChangePasswordState(prev => ({ ...prev, error: '', success: false }));
+                }}
+                className="text-ev-text-muted hover:text-ev-text-primary transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Success Message */}
+            {changePasswordState.success && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-ev-success/15 border border-ev-success/30 rounded-lg text-sm text-ev-success flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                Password changed successfully!
+              </motion.div>
+            )}
+
+            {/* Error Message */}
+            {changePasswordState.error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-ev-danger/15 border border-ev-danger/30 rounded-lg text-sm text-ev-danger flex items-center gap-2"
+              >
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {changePasswordState.error}
+              </motion.div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              {/* Current Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ev-text-secondary">Current Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your current password"
+                  value={changePasswordState.currentPassword}
+                  onChange={(e) =>
+                    setChangePasswordState(prev => ({ ...prev, currentPassword: e.target.value }))
+                  }
+                  disabled={changePasswordState.loading}
+                  className="w-full h-10 px-3 rounded-lg bg-[#0a0e14]/60 border border-ev-border/60 text-ev-text-primary placeholder:text-ev-text-muted focus:border-ev-accent/60 focus:ring-1 focus:ring-[rgba(0,212,170,0.2)] outline-none transition-colors disabled:opacity-50"
+                  required
+                />
+              </div>
+
+              {/* New Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ev-text-secondary">New Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter a new password (min 8 characters)"
+                  value={changePasswordState.newPassword}
+                  onChange={(e) =>
+                    setChangePasswordState(prev => ({ ...prev, newPassword: e.target.value }))
+                  }
+                  disabled={changePasswordState.loading}
+                  className="w-full h-10 px-3 rounded-lg bg-[#0a0e14]/60 border border-ev-border/60 text-ev-text-primary placeholder:text-ev-text-muted focus:border-ev-accent/60 focus:ring-1 focus:ring-[rgba(0,212,170,0.2)] outline-none transition-colors disabled:opacity-50"
+                  required
+                />
+              </div>
+
+              {/* Confirm New Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-ev-text-secondary">Confirm New Password</label>
+                <input
+                  type="password"
+                  placeholder="Confirm your new password"
+                  value={changePasswordState.confirmPassword}
+                  onChange={(e) =>
+                    setChangePasswordState(prev => ({ ...prev, confirmPassword: e.target.value }))
+                  }
+                  disabled={changePasswordState.loading}
+                  className="w-full h-10 px-3 rounded-lg bg-[#0a0e14]/60 border border-ev-border/60 text-ev-text-primary placeholder:text-ev-text-muted focus:border-ev-accent/60 focus:ring-1 focus:ring-[rgba(0,212,170,0.2)] outline-none transition-colors disabled:opacity-50"
+                  required
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowChangePasswordModal(false);
+                    setChangePasswordState(prev => ({ ...prev, error: '', success: false }));
+                  }}
+                  disabled={changePasswordState.loading}
+                  className="flex-1 border-ev-border hover:border-ev-border text-ev-text-secondary"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={changePasswordState.loading}
+                  className="flex-1 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold gap-2 disabled:opacity-60"
+                >
+                  {changePasswordState.loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Updating…
+                    </>
+                  ) : (
+                    'Update Password'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
