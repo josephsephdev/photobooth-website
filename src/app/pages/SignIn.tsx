@@ -120,7 +120,7 @@ export default function SignIn() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-[rgba(0,212,170,0.3)] group-hover:shadow-[rgba(0,212,170,0.5)] transition-shadow">
             <Camera className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-ev-text-primary">PhotoBooth Pro</span>
+          <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
         </Link>
       </div>
 
@@ -174,7 +174,7 @@ export default function SignIn() {
             {/* Title */}
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-ev-text-primary mb-2">Welcome back</h1>
-              <p className="text-ev-text-secondary text-sm">Sign in to your PhotoBooth Pro account</p>
+              <p className="text-ev-text-secondary text-sm">Sign in to your Luis&Co. Photobooth account</p>
             </div>
 
             {/* Form */}

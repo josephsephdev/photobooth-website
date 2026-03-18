@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router';
+import { Routes, Route, Navigate, useLocation } from 'react-router';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { ProductShowcase } from './components/ProductShowcase';
@@ -27,6 +27,7 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import RefundPolicy from './pages/RefundPolicy';
 import BillingConfig from './pages/BillingConfig';
 import ContactUs from './pages/ContactUs';
+import { useAuth } from './context/AuthContext';
 
 function LandingPage() {
   return (
@@ -45,6 +46,26 @@ function LandingPage() {
   );
 }
 
+function RequireAuth({ children }: { children: React.ReactElement }) {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen text-ev-text-primary flex items-center justify-center">
+        <p className="text-sm text-ev-text-secondary">Checking session...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/signin?redirect=${redirect}`} replace />;
+  }
+
+  return children;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -54,10 +75,38 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/pricing" element={<Pricing />} />
-      <Route path="/billing/configure" element={<BillingConfig />} />
-      <Route path="/account" element={<Account />} />
-      <Route path="/checkout/success" element={<CheckoutSuccess />} />
-      <Route path="/checkout/cancel" element={<CheckoutCancel />} />
+      <Route
+        path="/billing/configure"
+        element={
+          <RequireAuth>
+            <BillingConfig />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <RequireAuth>
+            <Account />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/checkout/success"
+        element={
+          <RequireAuth>
+            <CheckoutSuccess />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/checkout/cancel"
+        element={
+          <RequireAuth>
+            <CheckoutCancel />
+          </RequireAuth>
+        }
+      />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
       <Route path="/request-verification-email" element={<RequestVerificationEmail />} />
