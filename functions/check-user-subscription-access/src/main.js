@@ -61,18 +61,34 @@ async function getSubscriptionAccessState(databases, databaseId, collectionId, u
 
   const sub = result.documents[0];
   const now = new Date();
+  const nowIso = now.toISOString();
   const expiresAt = sub.expiresAt ? new Date(sub.expiresAt) : null;
   const isExpired = !expiresAt || expiresAt <= now;
+  let effectiveStatus = sub.status;
+
+  // Normalize persisted status when a live/canceling subscription has passed its end date.
+  if (isExpired && ['active', 'canceled'].includes(sub.status)) {
+    await databases.updateDocument(
+      databaseId,
+      collectionId,
+      sub.$id,
+      {
+        status: 'expired',
+        updatedAt: nowIso,
+      },
+    );
+    effectiveStatus = 'expired';
+  }
 
   // Statuses that grant access as long as the period hasn't ended
   const ACTIVE_STATUSES = ['active', 'canceled'];
 
-  const hasAccess = ACTIVE_STATUSES.includes(sub.status) && !isExpired;
+  const hasAccess = ACTIVE_STATUSES.includes(effectiveStatus) && !isExpired;
 
   return {
     hasAccess,
     accountType: hasAccess ? 'paid' : 'free',
-    subscriptionStatus: sub.status,
+    subscriptionStatus: effectiveStatus,
     planId: hasAccess ? sub.planId : null,
     planName: hasAccess ? sub.planName : null,
     expiresAt: sub.expiresAt || null,

@@ -52,11 +52,9 @@ export default function SignUp() {
     setSubmitting(true);
     try {
       // If there's already an active session, sign out first
-      // (This handles both verified AND unverified sessions)
       if (isAuthenticated) {
         await signOut();
       }
-      
       await signUp(email, password, fullName.trim());
 
       // ── Desktop app callback ──────────────────────────────────
@@ -131,7 +129,7 @@ export default function SignUp() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-[rgba(0,212,170,0.3)] group-hover:shadow-[rgba(0,212,170,0.5)] transition-shadow">
             <Camera className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
+          <span className="text-xl font-bold text-ev-text-primary">PhotoBooth Pro</span>
         </Link>
       </div>
 
@@ -185,7 +183,7 @@ export default function SignUp() {
             {/* Title */}
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-ev-text-primary mb-2">Create your account</h1>
-              <p className="text-ev-text-secondary text-sm">Get started with Luis&Co. Photobooth</p>
+              <p className="text-ev-text-secondary text-sm">Get started with PhotoBooth Pro</p>
             </div>
 
             {/* Form */}

@@ -14,7 +14,6 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const { signIn, signOut, isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -32,7 +31,6 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setUnverifiedEmail('');
     setSubmitting(true);
     try {
       // If there's already an active session, sign out first so we can sign in fresh
@@ -58,14 +56,7 @@ export default function SignIn() {
 
       navigate('/account');
     } catch (err: any) {
-      const errorMsg = err.message || 'Sign in failed';
-      
-      // Check if this is an unverified email error
-      if (errorMsg.includes('verify your email')) {
-        setUnverifiedEmail(email);
-      }
-      
-      setError(errorMsg);
+      setError(err.message || 'Sign in failed');
     } finally {
       setSubmitting(false);
     }
@@ -120,7 +111,7 @@ export default function SignIn() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ev-accent to-ev-cyan flex items-center justify-center shadow-lg shadow-[rgba(0,212,170,0.3)] group-hover:shadow-[rgba(0,212,170,0.5)] transition-shadow">
             <Camera className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-ev-text-primary">Luis&Co. Photobooth</span>
+          <span className="text-xl font-bold text-ev-text-primary">PhotoBooth Pro</span>
         </Link>
       </div>
 
@@ -174,7 +165,7 @@ export default function SignIn() {
             {/* Title */}
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-ev-text-primary mb-2">Welcome back</h1>
-              <p className="text-ev-text-secondary text-sm">Sign in to your Luis&Co. Photobooth account</p>
+              <p className="text-ev-text-secondary text-sm">Sign in to your PhotoBooth Pro account</p>
             </div>
 
             {/* Form */}
@@ -223,28 +214,13 @@ export default function SignIn() {
 
               {/* Forgot Password */}
               <div className="flex items-center justify-between">
-                {error && (
-                  <div className="text-xs text-ev-danger flex-1">
-                    {error}
-                    {unverifiedEmail && (
-                      <>
-                        {' '}
-                        <Link
-                          to="/request-verification-email"
-                          className="underline hover:text-ev-danger-hover font-medium"
-                        >
-                          Resend verification email
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                )}
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-ev-accent hover:text-ev-accent-hover transition-colors ml-auto font-medium"
+                {error && <p className="text-xs text-ev-danger">{error}</p>}
+                <button
+                  type="button"
+                  className="text-sm text-ev-accent hover:text-ev-accent-hover transition-colors ml-auto"
                 >
                   Forgot password?
-                </Link>
+                </button>
               </div>
 
               {/* Submit */}

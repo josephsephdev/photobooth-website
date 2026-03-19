@@ -12,7 +12,6 @@ import {
   CalendarDays,
   CheckCircle2,
   ArrowUpRight,
-  ChevronRight,
   Crown,
   Clock,
   Loader2,
@@ -32,7 +31,11 @@ import {
   getPaymentExpirationTime,
   getPaymentTimeRemaining,
 } from '../lib/database.service';
-import { checkSubscriptionAccess, cancelXenditPayment } from '../lib/subscription.service';
+import {
+  checkSubscriptionAccess,
+  cancelXenditPayment,
+  cancelXenditSubscription,
+} from '../lib/subscription.service';
 import { getUserDevices, removeDevice, type DeviceDocument } from '../lib/device.service';
 import { useState, useEffect } from 'react';
 
@@ -141,6 +144,9 @@ export default function Account() {
   const [cancelSuccess, setCancelSuccess] = useState<string | null>(null);
   const [devices, setDevices] = useState<DeviceDocument[]>([]);
   const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
+  const [cancellingSubscription, setCancellingSubscription] = useState(false);
+  const [subscriptionCancelError, setSubscriptionCancelError] = useState<string | null>(null);
+  const [subscriptionCancelSuccess, setSubscriptionCancelSuccess] = useState<string | null>(null);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [changePasswordState, setChangePasswordState] = useState({
     currentPassword: '',
@@ -205,6 +211,29 @@ export default function Account() {
   };
 
   const isPaid = access?.accountType === 'paid';
+  const isSubscriptionAlreadyCanceled = access?.subscriptionStatus?.toLowerCase() === 'canceled';
+
+  const handleCancelSubscription = async () => {
+    setSubscriptionCancelError(null);
+    setSubscriptionCancelSuccess(null);
+    setCancellingSubscription(true);
+
+    try {
+      const result = await cancelXenditSubscription();
+      const refreshed = await checkSubscriptionAccess();
+      setAccess(refreshed);
+
+      const effectiveDate = formatDate(result.effectiveAt || refreshed.expiresAt);
+      setSubscriptionCancelSuccess(
+        `Cancellation scheduled. Your subscription stays active until ${effectiveDate}.`,
+      );
+    } catch (err: any) {
+      const message = err?.message || 'Failed to cancel subscription';
+      setSubscriptionCancelError(message);
+    } finally {
+      setCancellingSubscription(false);
+    }
+  };
 
   const handleRemoveDevice = async (deviceId: string) => {
     setRemovingDeviceId(deviceId);
@@ -453,8 +482,20 @@ export default function Account() {
           {/* ============ Manage Subscription ============ */}
           <DashboardCard title="Manage Subscription" icon={Settings} delay={0.2}>
             <p className="text-sm text-ev-text-secondary mb-5">
-              Upgrade, downgrade, or manage your current subscription.
+              Upgrade or manage your current subscription.
             </p>
+            {subscriptionCancelSuccess && (
+              <div className="mb-4 p-3 bg-ev-success/15 border border-ev-success/30 rounded-lg text-sm text-ev-success flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                {subscriptionCancelSuccess}
+              </div>
+            )}
+            {subscriptionCancelError && (
+              <div className="mb-4 p-3 bg-ev-danger/15 border border-ev-danger/30 rounded-lg text-sm text-ev-danger flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {subscriptionCancelError}
+              </div>
+            )}
             <div className="flex flex-wrap gap-2">
               <Button
                 asChild
@@ -468,16 +509,19 @@ export default function Account() {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-ev-border hover:border-ev-accent/50 bg-ev-surface/30 hover:bg-ev-accent/10 text-ev-text-primary text-xs gap-1.5 transition-all"
-              >
-                <ChevronRight className="w-3.5 h-3.5" /> Downgrade
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
                 className="border-ev-border hover:border-ev-danger/50 bg-ev-surface/30 hover:bg-ev-danger/10 text-ev-text-primary hover:text-ev-danger text-xs gap-1.5 transition-all"
+                onClick={handleCancelSubscription}
+                disabled={!isPaid || isSubscriptionAlreadyCanceled || cancellingSubscription || loading}
               >
-                Cancel Subscription
+                {cancellingSubscription ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Cancelling...
+                  </>
+                ) : isSubscriptionAlreadyCanceled ? (
+                  'Cancellation Scheduled'
+                ) : (
+                  'Cancel Subscription'
+                )}
               </Button>
             </div>
           </DashboardCard>

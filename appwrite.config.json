@@ -142,7 +142,8 @@
             "timeout": 15,
             "commands": "npm install",
             "scopes": [
-                "documents.read"
+                "documents.read",
+                "documents.write"
             ],
             "specification": "s-0.5vcpu-512mb"
         },

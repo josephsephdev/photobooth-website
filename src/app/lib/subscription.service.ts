@@ -41,6 +41,13 @@ interface SubscriptionAccessResponse {
   watermarkEnabled: boolean;
 }
 
+interface CancelSubscriptionResponse {
+  message: string;
+  effectiveAt: string | null;
+  cancelAtPeriodEnd: boolean;
+  alreadyCanceled?: boolean;
+}
+
 // ── Checkout ───────────────────────────────────────────────────────
 
 /**
@@ -86,10 +93,14 @@ export async function createXenditCheckout(
 /**
  * Cancel the user's current subscription via Appwrite Function.
  */
-export async function cancelXenditSubscription(subscriptionDocId: string): Promise<void> {
+export async function cancelXenditSubscription(
+  subscriptionDocId?: string,
+): Promise<CancelSubscriptionResponse> {
+  const payload = subscriptionDocId ? { subscriptionDocId } : {};
+
   const execution = await functions.createExecution(
     FUNCTION_IDS.CANCEL_XENDIT_SUBSCRIPTION,
-    JSON.stringify({ subscriptionDocId }),
+    JSON.stringify(payload),
     false,
     undefined,
     ExecutionMethod.POST,
@@ -99,6 +110,14 @@ export async function cancelXenditSubscription(subscriptionDocId: string): Promi
     const body = tryParseJson(execution.responseBody);
     throw new Error(body?.error || 'Failed to cancel subscription');
   }
+
+  const data = tryParseJson(execution.responseBody);
+  return {
+    message: data?.message || 'Subscription cancellation scheduled',
+    effectiveAt: data?.effectiveAt || null,
+    cancelAtPeriodEnd: Boolean(data?.cancelAtPeriodEnd),
+    alreadyCanceled: Boolean(data?.alreadyCanceled),
+  };
 }
 
 /**
