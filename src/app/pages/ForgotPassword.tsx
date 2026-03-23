@@ -127,7 +127,7 @@ export default function ForgotPassword() {
 
                 <div className="bg-[#0a0e14]/40 rounded-lg p-4 mb-6 border border-ev-border/30">
                   <p className="text-xs text-ev-text-muted">
-                    The reset link will expire in 24 hours. If you don't see the email, check your spam folder.
+                    The reset link will expire in 15 minutes. If you don't see the email, check your spam folder.
                   </p>
                 </div>
 
