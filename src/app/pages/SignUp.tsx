@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { createDesktopAuthCode } from '../lib/desktop-auth.service';
+import { sanitizeUserName, sanitizeEmail } from '../lib/sanitize';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +38,7 @@ export default function SignUp() {
 
     // ── Client-side validation ──
     if (!fullName.trim()) {
-      setError('Full name is required');
+      setError('Username is required');
       return;
     }
     if (password.length < 8) {
@@ -156,8 +157,8 @@ export default function SignUp() {
                     {user.avatarInitial}
                   </div>
                   <div>
-                    <p className="font-semibold text-ev-text-primary text-sm">{user.name}</p>
-                    <p className="text-ev-text-muted text-xs">{user.email}</p>
+                    <p className="font-semibold text-ev-text-primary text-sm">{sanitizeUserName(user.name)}</p>
+                    <p className="text-ev-text-muted text-xs">{sanitizeEmail(user.email)}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -168,7 +169,7 @@ export default function SignUp() {
                     className="w-full h-10 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] transition-all duration-300 disabled:opacity-60"
                   >
                     <LogIn className="w-4 h-4 mr-2" />
-                    {submitting ? 'Connecting…' : `Continue as ${user.name}`}
+                    {submitting ? 'Connecting…' : `Continue as ${sanitizeUserName(user.name)}`}
                   </Button>
                   <button
                     type="button"

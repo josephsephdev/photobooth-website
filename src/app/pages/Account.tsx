@@ -38,6 +38,7 @@ import {
 } from '../lib/subscription.service';
 import { getUserDevices, removeDevice, type DeviceDocument } from '../lib/device.service';
 import { useState, useEffect } from 'react';
+import { sanitizeUserName, sanitizeEmail } from '../lib/sanitize';
 
 /* ------------------------------------------------------------------ */
 /*  Data is fetched from the backend in the component below           */
@@ -354,10 +355,10 @@ export default function Account() {
                 {user?.avatarInitial ?? 'U'}
               </div>
               <div>
-                <p className="font-semibold text-ev-text-primary">{user?.name ?? 'User'}</p>
+                <p className="font-semibold text-ev-text-primary">{user ? sanitizeUserName(user.name) : 'User'}</p>
                 <p className="text-sm text-ev-text-secondary flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5" />
-                  {user?.email ?? 'user@example.com'}
+                  {user ? sanitizeEmail(user.email) : 'user@example.com'}
                 </p>
                 {user && !user.emailVerified && (
                   <p className="text-xs text-ev-warning flex items-center gap-1 mt-1">
