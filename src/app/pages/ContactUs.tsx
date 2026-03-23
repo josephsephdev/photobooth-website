@@ -26,7 +26,12 @@ export default function ContactUs() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      // In development, use localhost:3001; in production, use the same domain
+      const apiUrl = import.meta.env.DEV 
+        ? 'http://localhost:3001/api/contact'
+        : '/api/contact';
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
