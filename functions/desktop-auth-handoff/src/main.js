@@ -283,7 +283,8 @@ async function handleRegisterDevice({ req, res, log, error, databases, DATABASE_
   }
 
   try {
-    // 1. Get device limit from active subscription
+    // 1. Get device limit from active subscription (paid users only)
+    // Free users (no active subscription) have unlimited devices
     const now = new Date().toISOString();
     const subs = await databases.listDocuments(
       DATABASE_ID,
@@ -297,12 +298,12 @@ async function handleRegisterDevice({ req, res, log, error, databases, DATABASE_
       ],
     );
 
-    if (subs.total === 0) {
-      return res.json({ ok: false, error: 'No active subscription found' }, 403);
-    }
-
-    const subscription = subs.documents[0];
-    const deviceLimit = subscription.deviceLimit ?? DEFAULT_DEVICE_LIMIT;
+    // If no active subscription, free user has unlimited devices (no limit)
+    // If subscription exists, use its configured device limit
+    const hasActiveSubscription = subs.total > 0;
+    const deviceLimit = hasActiveSubscription 
+      ? (subs.documents[0].deviceLimit ?? DEFAULT_DEVICE_LIMIT)
+      : null; // null = unlimited for free users
 
     // 2. Get current devices for this user
     const existingDevices = await databases.listDocuments(
@@ -332,12 +333,12 @@ async function handleRegisterDevice({ req, res, log, error, databases, DATABASE_
         ok: true,
         success: true,
         totalDevices: existingDevices.total,
-        deviceLimit,
+        deviceLimit: deviceLimit ?? 0, // Return 0 to indicate unlimited
       });
     }
 
-    // 4. Check device limit
-    if (existingDevices.total >= deviceLimit) {
+    // 4. Check device limit (only for paid users with a subscription)
+    if (deviceLimit !== null && existingDevices.total >= deviceLimit) {
       log(`Device limit reached for user ${userId}: ${existingDevices.total}/${deviceLimit}`);
       return res.json({
         ok: false,
@@ -374,12 +375,12 @@ async function handleRegisterDevice({ req, res, log, error, databases, DATABASE_
       ],
     );
 
-    log(`Device ${deviceId} registered for user ${userId} (${existingDevices.total + 1}/${deviceLimit})`);
+    log(`Device ${deviceId} registered for user ${userId} (${existingDevices.total + 1}/${deviceLimit ?? 'unlimited'})`);
     return res.json({
       ok: true,
       success: true,
       totalDevices: existingDevices.total + 1,
-      deviceLimit,
+      deviceLimit: deviceLimit ?? 0, // Return 0 to indicate unlimited
     });
   } catch (err) {
     error(`register-device error: ${err.message}`);
