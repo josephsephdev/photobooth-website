@@ -1,29 +1,10 @@
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
-import { Camera, ArrowLeft, Mail, Phone, MapPin, User, Send } from 'lucide-react';
+import { Camera, ArrowLeft, Mail, Phone, MapPin, User } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Footer } from '../components/Footer';
-import { useState } from 'react';
 
 export default function ContactUs() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setFormData({ fullName: '', email: '', subject: '', message: '' });
-  };
-
   return (
     <div className="min-h-screen text-ev-text-primary flex flex-col">
       {/* Background */}
@@ -121,112 +102,7 @@ export default function ContactUs() {
           </div>
         </motion.div>
 
-        {/* Contact Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <h2 className="text-2xl font-bold text-ev-text-primary mb-6">Send Us a Message</h2>
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#00d4aa] to-[#00bcd4] rounded-2xl opacity-10 blur-xl" />
-            <div className="relative bg-gradient-to-br from-ev-surface/90 to-ev-surface-elevated/90 rounded-2xl p-8 md:p-10 border border-ev-border">
-              {submitted ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-ev-accent/20 to-ev-cyan/20 flex items-center justify-center mx-auto mb-4 border border-ev-accent/30">
-                    <Send className="w-8 h-8 text-ev-accent" />
-                  </div>
-                  <h3 className="text-xl font-bold text-ev-text-primary mb-2">Message Sent!</h3>
-                  <p className="text-ev-text-secondary mb-6">
-                    Thank you for reaching out. We'll get back to you within 1–2 business days.
-                  </p>
-                  <Button
-                    onClick={() => { setSubmitted(false); setFormData({ fullName: '', email: '', subject: '', message: '' }); setError(''); }}
-                    className="bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold"
-                  >
-                    Send Another Message
-                  </Button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="fullName" className="block text-sm font-medium text-ev-text-secondary mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        id="fullName"
-                        name="fullName"
-                        required
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        placeholder="Juan Dela Cruz"
-                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-ev-text-secondary mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="you@example.com"
-                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-ev-text-secondary mb-2">
-                      Subject
-                    </label>
-                    <input
-                      type="text"
-                      id="subject"
-                      name="subject"
-                      required
-                      value={formData.subject}
-                      onChange={handleChange}
-                      placeholder="How can we help?"
-                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-ev-text-secondary mb-2">
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={5}
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Tell us more about your inquiry..."
-                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all resize-none"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full sm:w-auto bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-ev-accent/30 hover:shadow-ev-accent/50 transition-all duration-300 px-8 py-3 gap-2"
-                  >
-                    <Send className="w-4 h-4" />
-                    Send Message
-                  </Button>
-                </form>
-              )}
-            </div>
-          </div>
 
-          <p className="text-sm text-ev-text-muted mt-6 text-center">
-            We aim to respond to all inquiries within 1–2 business days.
-          </p>
-        </motion.div>
       </div>
 
       <Footer />
