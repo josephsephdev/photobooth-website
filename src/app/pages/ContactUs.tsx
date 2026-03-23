@@ -13,45 +13,15 @@ export default function ContactUs() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      // In development, use localhost:3001; in production, use the same domain
-      const apiUrl = import.meta.env.DEV 
-        ? 'http://localhost:3001/api/contact'
-        : '/api/contact';
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send message');
-      }
-
-      // Success - show confirmation
-      setSubmitted(true);
-      setFormData({ fullName: '', email: '', subject: '', message: '' });
-    } catch (err: any) {
-      setError(err.message || 'Failed to send message. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    setSubmitted(true);
+    setFormData({ fullName: '', email: '', subject: '', message: '' });
   };
 
   return (
@@ -191,9 +161,8 @@ export default function ContactUs() {
                         required
                         value={formData.fullName}
                         onChange={handleChange}
-                        disabled={loading}
                         placeholder="Juan Dela Cruz"
-                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
                       />
                     </div>
                     <div>
@@ -207,9 +176,8 @@ export default function ContactUs() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        disabled={loading}
                         placeholder="you@example.com"
-                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
                       />
                     </div>
                   </div>
@@ -224,9 +192,8 @@ export default function ContactUs() {
                       required
                       value={formData.subject}
                       onChange={handleChange}
-                      disabled={loading}
                       placeholder="How can we help?"
-                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
                     />
                   </div>
                   <div>
@@ -240,23 +207,16 @@ export default function ContactUs() {
                       rows={5}
                       value={formData.message}
                       onChange={handleChange}
-                      disabled={loading}
                       placeholder="Tell us more about your inquiry..."
-                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all resize-none disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all resize-none"
                     />
                   </div>
-                  {error && (
-                    <div className="p-4 rounded-lg bg-ev-danger/15 border border-ev-danger/30">
-                      <p className="text-sm text-ev-danger">{error}</p>
-                    </div>
-                  )}
                   <Button
                     type="submit"
-                    disabled={loading}
-                    className="w-full sm:w-auto bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-ev-accent/30 hover:shadow-ev-accent/50 transition-all duration-300 px-8 py-3 gap-2 disabled:opacity-60"
+                    className="w-full sm:w-auto bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-ev-accent/30 hover:shadow-ev-accent/50 transition-all duration-300 px-8 py-3 gap-2"
                   >
                     <Send className="w-4 h-4" />
-                    {loading ? 'Sending...' : 'Send Message'}
+                    Send Message
                   </Button>
                 </form>
               )}
