@@ -11,6 +11,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
 import authRoutes    from './routes/auth.js';
@@ -62,6 +63,7 @@ const generalLimiter = rateLimit({
 });
 
 // ── Middleware ──────────────────────────────────────────────────────
+app.use(helmet());
 app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json());
 
