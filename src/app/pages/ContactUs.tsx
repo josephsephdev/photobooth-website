@@ -13,14 +13,40 @@ export default function ContactUs() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send message');
+      }
+
+      // Success - show confirmation
+      setSubmitted(true);
+      setFormData({ fullName: '', email: '', subject: '', message: '' });
+    } catch (err: any) {
+      setError(err.message || 'Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -140,7 +166,7 @@ export default function ContactUs() {
                     Thank you for reaching out. We'll get back to you within 1–2 business days.
                   </p>
                   <Button
-                    onClick={() => { setSubmitted(false); setFormData({ fullName: '', email: '', subject: '', message: '' }); }}
+                    onClick={() => { setSubmitted(false); setFormData({ fullName: '', email: '', subject: '', message: '' }); setError(''); }}
                     className="bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold"
                   >
                     Send Another Message
@@ -160,8 +186,9 @@ export default function ContactUs() {
                         required
                         value={formData.fullName}
                         onChange={handleChange}
+                        disabled={loading}
                         placeholder="Juan Dela Cruz"
-                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
+                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all disabled:opacity-50"
                       />
                     </div>
                     <div>
@@ -175,8 +202,9 @@ export default function ContactUs() {
                         required
                         value={formData.email}
                         onChange={handleChange}
+                        disabled={loading}
                         placeholder="you@example.com"
-                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
+                        className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -191,8 +219,9 @@ export default function ContactUs() {
                       required
                       value={formData.subject}
                       onChange={handleChange}
+                      disabled={loading}
                       placeholder="How can we help?"
-                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all"
+                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all disabled:opacity-50"
                     />
                   </div>
                   <div>
@@ -206,16 +235,23 @@ export default function ContactUs() {
                       rows={5}
                       value={formData.message}
                       onChange={handleChange}
+                      disabled={loading}
                       placeholder="Tell us more about your inquiry..."
-                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all resize-none"
+                      className="w-full px-4 py-3 bg-[#0a0e14] border border-ev-border rounded-[var(--ev-radius-sm)] text-ev-text-primary placeholder-ev-text-muted focus:outline-none focus:border-ev-accent focus:shadow-[0_0_0_3px_rgba(0,212,170,0.25)] transition-all resize-none disabled:opacity-50"
                     />
                   </div>
+                  {error && (
+                    <div className="p-4 rounded-lg bg-ev-danger/15 border border-ev-danger/30">
+                      <p className="text-sm text-ev-danger">{error}</p>
+                    </div>
+                  )}
                   <Button
                     type="submit"
-                    className="w-full sm:w-auto bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-ev-accent/30 hover:shadow-ev-accent/50 transition-all duration-300 px-8 py-3 gap-2"
+                    disabled={loading}
+                    className="w-full sm:w-auto bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-ev-accent/30 hover:shadow-ev-accent/50 transition-all duration-300 px-8 py-3 gap-2 disabled:opacity-60"
                   >
                     <Send className="w-4 h-4" />
-                    Send Message
+                    {loading ? 'Sending...' : 'Send Message'}
                   </Button>
                 </form>
               )}

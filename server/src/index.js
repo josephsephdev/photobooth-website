@@ -6,6 +6,7 @@
  *   /api/billing/*        — create Xendit checkout
  *   /api/xendit/*         — Xendit webhook callbacks
  *   /api/account/*        — subscription & payment data
+ *   /api/contact          — contact form email
  */
 
 import 'dotenv/config';
@@ -18,6 +19,7 @@ import authRoutes    from './routes/auth.js';
 import billingRoutes from './routes/billing.js';
 import webhookRoutes from './routes/webhook.js';
 import accountRoutes from './routes/account.js';
+import contactRoutes from './routes/contact.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -77,6 +79,7 @@ app.use('/api/auth',    authRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/xendit',  webhookRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/contact', contactRoutes);
 
 // ── Health check ───────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
