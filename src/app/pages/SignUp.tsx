@@ -8,6 +8,7 @@ import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { createDesktopAuthCode } from '../lib/desktop-auth.service';
 import { sanitizeUserName, sanitizeEmail } from '../lib/sanitize';
+import { checkPasswordStrength, getStrengthDisplay } from '../lib/password.service';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +22,9 @@ export default function SignUp() {
   const { signUp, signOut, isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Get password strength info
+  const passwordStrength = checkPasswordStrength(password);
 
   // Desktop app redirect params
   const source = searchParams.get('source');
@@ -41,8 +45,8 @@ export default function SignUp() {
       setError('Username is required');
       return;
     }
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+    if (!passwordStrength.isValid) {
+      setError('Password does not meet all requirements');
       return;
     }
     if (password !== confirmPassword) {
@@ -248,6 +252,76 @@ export default function SignUp() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+
+                {/* Password Strength Indicator */}
+                {password && (
+                  <div className="mt-3 space-y-2">
+                    {/* Strength Bar */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-ev-text-muted">Password strength:</span>
+                        <span className={`text-xs font-semibold ${getStrengthDisplay(passwordStrength.strength).color}`}>
+                          {getStrengthDisplay(passwordStrength.strength).label}
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-ev-background rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${getStrengthDisplay(passwordStrength.strength).barColor}`}
+                          style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Requirements Checklist */}
+                    <div className="space-y-1.5 pt-1">
+                      <div
+                        className={`flex items-center gap-2 text-xs py-1.5 px-2.5 rounded-md ${
+                          passwordStrength.requirements.minLength
+                            ? 'bg-ev-success/10 text-ev-success'
+                            : 'bg-ev-surface/30 text-ev-text-muted'
+                        }`}
+                      >
+                        <span className={passwordStrength.requirements.minLength ? '✓' : '○'}>
+                          {passwordStrength.requirements.minLength ? '✓' : '○'}
+                        </span>
+                        At least 8 characters
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 text-xs py-1.5 px-2.5 rounded-md ${
+                          passwordStrength.requirements.uppercase
+                            ? 'bg-ev-success/10 text-ev-success'
+                            : 'bg-ev-surface/30 text-ev-text-muted'
+                        }`}
+                      >
+                        <span>{passwordStrength.requirements.uppercase ? '✓' : '○'}</span>
+                        One uppercase letter (A-Z)
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 text-xs py-1.5 px-2.5 rounded-md ${
+                          passwordStrength.requirements.number
+                            ? 'bg-ev-success/10 text-ev-success'
+                            : 'bg-ev-surface/30 text-ev-text-muted'
+                        }`}
+                      >
+                        <span>{passwordStrength.requirements.number ? '✓' : '○'}</span>
+                        One number (0-9)
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 text-xs py-1.5 px-2.5 rounded-md ${
+                          passwordStrength.requirements.specialChar
+                            ? 'bg-ev-success/10 text-ev-success'
+                            : 'bg-ev-surface/30 text-ev-text-muted'
+                        }`}
+                      >
+                        <span>{passwordStrength.requirements.specialChar ? '✓' : '○'}</span>
+                        One special character (!@#$%^&*)
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Confirm Password */}
