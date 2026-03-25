@@ -7,7 +7,6 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { createDesktopAuthCode } from '../lib/desktop-auth.service';
-import { sanitizeUserName, sanitizeEmail } from '../lib/sanitize';
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +14,6 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const { signIn, signOut, isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -33,7 +31,6 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setUnverifiedEmail('');
     setSubmitting(true);
     try {
       // If there's already an active session, sign out first so we can sign in fresh
@@ -59,14 +56,7 @@ export default function SignIn() {
 
       navigate('/account');
     } catch (err: any) {
-      const errorMsg = err.message || 'Sign in failed';
-      
-      // Check if this is an unverified email error
-      if (errorMsg.includes('verify your email')) {
-        setUnverifiedEmail(email);
-      }
-      
-      setError(errorMsg);
+      setError(err.message || 'Sign in failed');
     } finally {
       setSubmitting(false);
     }
@@ -146,8 +136,8 @@ export default function SignIn() {
                     {user.avatarInitial}
                   </div>
                   <div>
-                    <p className="font-semibold text-ev-text-primary text-sm">{sanitizeUserName(user.name)}</p>
-                    <p className="text-ev-text-muted text-xs">{sanitizeEmail(user.email)}</p>
+                    <p className="font-semibold text-ev-text-primary text-sm">{user.name}</p>
+                    <p className="text-ev-text-muted text-xs">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -158,7 +148,7 @@ export default function SignIn() {
                     className="w-full h-10 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.25)] transition-all duration-300 disabled:opacity-60"
                   >
                     <LogIn className="w-4 h-4 mr-2" />
-                    {submitting ? 'Connecting…' : `Continue as ${sanitizeUserName(user.name)}`}
+                    {submitting ? 'Connecting…' : `Continue as ${user.name}`}
                   </Button>
                   <button
                     type="button"
@@ -224,28 +214,13 @@ export default function SignIn() {
 
               {/* Forgot Password */}
               <div className="flex items-center justify-between">
-                {error && (
-                  <div className="text-xs text-ev-danger flex-1">
-                    {error}
-                    {unverifiedEmail && (
-                      <>
-                        {' '}
-                        <Link
-                          to="/request-verification-email"
-                          className="underline hover:text-ev-danger-hover font-medium"
-                        >
-                          Resend verification email
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                )}
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-ev-accent hover:text-ev-accent-hover transition-colors ml-auto font-medium"
+                {error && <p className="text-xs text-ev-danger">{error}</p>}
+                <button
+                  type="button"
+                  className="text-sm text-ev-accent hover:text-ev-accent-hover transition-colors ml-auto"
                 >
                   Forgot password?
-                </Link>
+                </button>
               </div>
 
               {/* Submit */}
