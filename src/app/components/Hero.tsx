@@ -136,7 +136,7 @@ export function Hero() {
             variant="outline"
             className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
           >
-            <a href="https://youtu.be/MVabdXwwAgc" target="_blank" rel="noopener noreferrer">
+            <a href="https://youtu.be/-c2fRsaBNeo" target="_blank" rel="noopener noreferrer">
               App Showcase
             </a>
           </Button>
