@@ -5,13 +5,7 @@ import { Link } from 'react-router';
 import { useDownloadUrl } from '../hooks/useDownloadUrl';
 
 export function Hero() {
-  const { downloadUrl } = useDownloadUrl();
-
-  const handleDownload = () => {
-    if (downloadUrl) {
-      window.open(downloadUrl, '_blank');
-    }
-  };
+  const { downloadUrl, loading } = useDownloadUrl();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -38,7 +32,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-gradient-to-r from-ev-accent to-ev-cyan bg-clip-text text-transparent leading-tight"
+          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-gradient-to-r from-ev-text-primary via-[#b0f0e0] to-[#a0e8f0] bg-clip-text text-transparent leading-tight"
         >
           Luis&Co.
           <br />
@@ -71,14 +65,22 @@ export function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Button
-            asChild
+            asChild={!!downloadUrl}
+            disabled={loading && !downloadUrl}
             size="lg"
-            className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300"
+            className="text-lg px-8 py-6 bg-gradient-to-r from-ev-accent to-ev-cyan hover:from-ev-accent-hover hover:to-[#00d0e8] text-[#0a0e14] font-semibold shadow-lg shadow-[rgba(0,212,170,0.4)] hover:shadow-[rgba(0,212,170,0.6)] transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <button onClick={handleDownload} type="button" className="inline-flex items-center">
-              <Download className="mr-2 h-5 w-5" />
-              Download Now
-            </button>
+            {downloadUrl ? (
+              <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                <Download className="mr-2 h-5 w-5 inline" />
+                Download Now
+              </a>
+            ) : (
+              <>
+                <Download className="mr-2 h-5 w-5 inline" />
+                {loading ? 'Loading...' : 'Download Now'}
+              </>
+            )}
           </Button>
 
           <Button
@@ -102,52 +104,12 @@ export function Hero() {
           </Button>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="mt-12 flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
-          >
-            <a href="https://youtu.be/rtfrtIdY2mw" target="_blank" rel="noopener noreferrer">
-              How to purchase a subscription
-            </a>
-          </Button>
-
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
-          >
-            <a href="https://youtu.be/YTu_MZW9YFc" target="_blank" rel="noopener noreferrer">
-              How to install Luis&Co. Photobooth app
-            </a>
-          </Button>
-
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="text-lg px-8 py-6 border-ev-border hover:border-ev-accent hover:bg-ev-accent/10 transition-all duration-300"
-          >
-            <a href="https://youtu.be/MVabdXwwAgc" target="_blank" rel="noopener noreferrer">
-              App Showcase
-            </a>
-          </Button>
-        </motion.div>
-
         {/* Product preview video */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="mt-8 relative"
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-20 relative"
         >
           <div className="relative mx-auto max-w-5xl">
             <div className="relative bg-gradient-to-br from-ev-surface/50 to-[#141820]/50 rounded-2xl border border-ev-border/50 p-4 shadow-2xl">
