@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.1.6",
+  "latestVersion": "2.2.3",
   "minimumSupportedVersion": "1.9.0",
-  "downloadUrl": "https://github.com/JisooKristo/Photobooth-app-downloads/releases/download/v2.1.6/Luis.Co.Photobooth.Setup.2.1.6.exe",
-  "releaseNotes": "🎉 v2.1.6 - Added a toggle button for the Photo Review Preview Feature"
+  "downloadUrl": "https://github.com/JisooKristo/Photobooth-app-downloads/releases/download/v2.2.3/Luis.Co.Photobooth.Setup.2.2.3.exe",
+  "releaseNotes": "🎉 v2.2.3 - Improved Template Designer, Improved Photo Quality, Improved session history, Improved alerts, bug fixes"
 }
